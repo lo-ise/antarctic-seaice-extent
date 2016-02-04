@@ -7,16 +7,16 @@ import os
 arcpy.CheckOutExtension('Spatial')
 
 # Setting up the processing environment
-arcpy.env.workspace = 'e:/manch_app_exercise/antarctic_sea_ice.gdb'
-arcpy.env.scratchWorkspace = 'e:/manch_app_exercise/antarctic_sea_ice_scratch.gdb'
+arcpy.env.workspace = 'e:/dev/antarctic-seaice-extent/antarctic_sea_ice.gdb'
+arcpy.env.scratchWorkspace = 'e:/dev/antarctic-seaice-extent/antarctic_sea_ice_scratch.gdb'
 arcpy.env.outputCoordinateSystem = arcpy.SpatialReference(102020)
 arcpy.env.overwriteOutput = True
 
 # Input sea ice data directory and creation of a list of files
-data_dir = 'E:/manch_app_exercise/all/'
+data_dir = 'e:/dev/antarctic-seaice-extent/data/'
 data_listing = glob.glob('{}nt_????0901*.tif'.format(data_dir))
 
-# Creating a table in the geodatabse to store results of the area calculation
+# Creating a table in the geodatabase to store results of the area calculation
 arcpy.CreateTable_management(arcpy.env.workspace, 'extent_results') 
 arcpy.AddField_management("extent_results", 'data_source', "TEXT")
 arcpy.AddField_management("extent_results", 'area', "DOUBLE")

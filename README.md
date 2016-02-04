@@ -58,6 +58,50 @@ Finally, `arcpy.env.overwriteOutput = True` prevents the annoyance of having to 
 
 ## Extracting area of sea ice extent from one piece of data
 
+In order to extract the sea ice extent from the dataset of sea ice concetration, we need to chain together a series of functions. To do this we will use ArcPy commands.
+
+Before that though, choose a raster from the `data` directory and add it to ArcMap. For this example we will use `nt_19810103_n07_v01_s.tif`
+
+The workflow will be:
+
+1. Load in the raster data into an ArcPy object.
+2. Use raster conditional statement within the ArcGIS Spatial Analyst extension, to extract all cells that are 15% or above, indicating the extent of sea ice, and output a raster mask with all sea ice cells with the value of 1.
+3. Convert the raster to a polygon feature class. Note, there might be more than one polygon geometry. 
+4. Total up the areas of the polygons within the feature class. 
+
+Type the following into the Python prompt:
+
+```python
+import numpy
+from arcpy.sa import *
+
+```
+Here we are simply importing some extra python functionality which allows us to easily total up the polygon areas at the end.. we will come to this...
+
+And we are importing all the ArcPy Spatial Analyst functions as well. Make sure you have this extension enabled. 
+
+```python
+seaice_raster = Raster('nt_19810103_n07_v01_s.tif')
+seaice_mask = Con(seaice_raster >= 15, 1)
+seaice_mask.save('nt_19810103_n07_v01_s_mask')
+```
+In this three lines we are creating a Raster object, pulling out all the cells whose values are 15 or above to a mask object, and finally saving the mask object to the geodatabase. 
+
+```python
+arcpy.RasterToPolygon_conversion(seaice_mask, "nt_19810103_n07_v01_s_poly")
+```
+
+This line converts the raster mask to a polygon feature class and saves it to the geodatabase.
+
+```python
+area_field = arcpy.da.TableToNumPyArray("nt_19810103_n07_v01_s_poly", "Shape_Area")
+total_area = area_field["Shape_Area"].sum()
+print total_area
+
+```
+
+These final few lines extract all the records in the `Shape_Area` field of the attribute table, which is already calculated in the previous step by default. It them sums these values which give is `total_area`. 
+
 ## Extracting sea ice extent from one day, every 10 years
 
 ### We need to write a script
