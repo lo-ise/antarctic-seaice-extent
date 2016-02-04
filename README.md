@@ -124,10 +124,10 @@ Here are some ideas for ways to extend this porject, now that you have a script 
 
 ```python
 # ie. 1st September for every year
-data_listing = glob.glob('{}nt_????0901*.tif'.format(data_dir)
+data_listing = glob.glob('{}nt_????0901*.tif'.format(data_dir))
 
 # ie. all rasters available for the year 1984
-data_listing = glob.glob('{}nt_1984*.tif'.format(data_dir)
+data_listing = glob.glob('{}nt_1984*.tif'.format(data_dir))
 
 ```
 
