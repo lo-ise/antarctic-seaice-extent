@@ -7,6 +7,7 @@ in_ras = 'nt_19810103_n07_v01_s.tif'
 arcpy.env.workspace = 'e:/manch_app_exercise/antarctic_sea_ice.gdb'
 arcpy.env.scratchWorkspace = 'e:/manch_app_exercise/antarctic_sea_ice_scratch.gdb'
 arcpy.env.outputCoordinateSystem = arcpy.SpatialReference(102020)
+arcpy.env.overwriteOutput = True
 
 seaice_raster = Raster('nt_19810103_n07_v01_s.tif')
 seaice_mask = Con(seaice_raster >= 15, 1)
