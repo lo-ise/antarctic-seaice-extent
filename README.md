@@ -102,7 +102,11 @@ print total_area
 
 These final few lines extract all the records in the `Shape_Area` field of the attribute table, which is already calculated in the previous step by default. It them sums these values which give is `total_area`. 
 
-## Extracting sea ice extent from one day, every 10 years
+## Extracting sea ice extent from multiple grids
+
+As mentioned above, daily sea ice concentration data from this dataset goes back to 1978. However, for this exercise, we are just going to see how the sea ice extent changes over one year. We could take 365 data grids, but instead we are only going to take 24, from the 1st and 15th of every month. 
+
+In the `data` directory, 
 
 ### We need to write a script
 
@@ -110,4 +114,28 @@ These final few lines extract all the records in the `Shape_Area` field of the a
 
 ## Extracting sea ice extent from any number of days of data
 
+## What can you do from here?
 
+Here are some ideas for ways to extend this porject, now that you have a script for extracting sea ice extent. 
+
+* Download [all the monthly data from NSIDC](https://nsidc.org/data/nsidc-0051), and run this script over the whole time series. 
+
+* Download all the daily data from the timeseries and run this script over all available days, one day for each year, one month, or whatever you choose. To do this, just select the day/month/year of rasters you want by ammending this line in `area_multiple_grid.py`:
+
+```python
+# ie. 1st September for every year
+data_listing = glob.glob('{}nt_????0901*.tif'.format(data_dir)
+
+# ie. all rasters available for the year 1984
+data_listing = glob.glob('{}nt_1984*.tif'.format(data_dir)
+
+```
+
+* Graph out the results
+
+* Create a time attribute, to the polygon features and run animations. 
+
+
+## Reference
+
+Cavalieri, D. J., C. L. Parkinson, P. Gloersen, and H. J. Zwally. 1996, updated yearly. Sea Ice Concentrations from Nimbus-7 SMMR and DMSP SSM/I-SSMIS Passive Microwave Data, Version 1. [indicate subset used]. Boulder, Colorado USA. NASA National Snow and Ice Data Center Distributed Active Archive Center. http://dx.doi.org/10.5067/8GQ8LZQVL0VL. [Date Accessed].
