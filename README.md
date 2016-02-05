@@ -5,7 +5,7 @@ A tutorial to calculate Antarctic Sea Ice extent from a timeseries of Sea Ice co
 
 This exercise presents a way you might want to calculate sea ice extent from sea ice concentration data, using ArcGIS.
 
-The exercise will begin by showing a flow of commands to go from reading in the sea ice concentration data, to ending up with a calculation of the area. It will demonstrate this with one days worth of data, a single band raster dataset. 
+The exercise will begin by showing a flow of commands to go from reading in the sea ice concentration data, to ending up with a calculation of the area. It will demonstrate this on one single band raster dataset. 
 
 The exercise will show how to do this by typing commands into the Python prompt in ArcGIS Desktop. 
 
@@ -25,7 +25,13 @@ Datasets
 Coding / Scripting
 * An introduction to scripting in ArcGIS using ArcPy (Python library). 
 
+## Tools required
+
+ESRI ArcGIS 10, 10.1, 10.2 or ArcGIS Pro with Spatial Analyst extension
+
 ## The data source
+
+
 
 ## Project setup
 
@@ -114,6 +120,13 @@ In the `data` directory,
 
 ## Extracting sea ice extent from any number of days of data
 
+## Final thoughts...
+
+If this is the first time you have tried scripting, don't worry. Try things, make mistakes, break things and work out why they aren't running. Play around with different ArcPy functions and enjoy. You can't break anything!
+
+Finally, watch out for typos!
+
+
 ## What can you do from here?
 
 Here are some ideas for ways to extend this porject, now that you have a script for extracting sea ice extent. 
@@ -133,8 +146,9 @@ data_listing = glob.glob('{}nt_1984*.tif'.format(data_dir))
 
 * Graph out the results
 
-* Create a time attribute, to the polygon features and run animations. 
+* Create a time attribute on the polygon features and run animations. 
 
+* Calculate the extent of ice that is classified as over 50% concentration. 
 
 ## Reference
 

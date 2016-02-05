@@ -1,6 +1,7 @@
-import numpy
 import arcpy
 from arcpy.sa import *
+
+import numpy
 import glob
 import os
 
@@ -9,17 +10,18 @@ arcpy.CheckOutExtension('Spatial')
 # Setting up the processing environment
 arcpy.env.workspace = 'e:/dev/antarctic-seaice-extent/antarctic_sea_ice.gdb'
 arcpy.env.scratchWorkspace = 'e:/dev/antarctic-seaice-extent/antarctic_sea_ice_scratch.gdb'
-arcpy.env.outputCoordinateSystem = arcpy.SpatialReference(102020)
+arcpy.env.outputCoordinateSystem = arcpy.SpatialReference('South Pole Lambert Azimuthal Equal Area')
 arcpy.env.overwriteOutput = True
 
 # Input sea ice data directory and creation of a list of files
-data_dir = 'e:/dev/antarctic-seaice-extent/data/'
-data_listing = glob.glob('{}nt_????0901*.tif'.format(data_dir))
+data_dir = 'e:/dev/antarctic-seaice-extent/data_monthly/'
+data_listing = glob.glob('{}nt_201401*.tif'.format(data_dir))
 
 # Creating a table in the geodatabase to store results of the area calculation
-arcpy.CreateTable_management(arcpy.env.workspace, 'extent_results') 
-arcpy.AddField_management("extent_results", 'data_source', "TEXT")
-arcpy.AddField_management("extent_results", 'area', "DOUBLE")
+if not arcpy.Exists('extent_results'):
+    arcpy.CreateTable_management(arcpy.env.workspace, 'extent_results') 
+    arcpy.AddField_management("extent_results", 'data_source', "TEXT")
+    arcpy.AddField_management("extent_results", 'area', "DOUBLE")
 
 # This line creates an object for inputing data into the results table
 table_input = arcpy.da.InsertCursor('extent_results', ['data_source', 'area'])
@@ -34,11 +36,12 @@ table_input = arcpy.da.InsertCursor('extent_results', ['data_source', 'area'])
 
 for data in data_listing:
     raster_name = os.path.basename(data)
+    raster_name = raster_name.replace('.tif', '')
     seaice_raster = Raster(data)
     seaice_mask = Con(seaice_raster >= 15, 1)
-    seaice_mask.save('nt_19840902_n07_s_mask')
-    arcpy.RasterToPolygon_conversion(seaice_mask, "nt_19840902_n07_v01_s_poly")
-    area_field = arcpy.da.TableToNumPyArray("nt_19840902_n07_v01_s_poly", "Shape_Area")
+    seaice_mask.save("{}_mask".format(raster_name))
+    arcpy.RasterToPolygon_conversion(seaice_mask, "{}_mask_poly".format(raster_name))
+    area_field = arcpy.da.TableToNumPyArray("{}_mask_poly".format(raster_name), "Shape_Area")
     total_area = area_field["Shape_Area"].sum()
     table_input.insertRow([raster_name, total_area])
 
