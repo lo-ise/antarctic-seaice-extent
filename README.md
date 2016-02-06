@@ -198,19 +198,17 @@ You will see the extent polygons appearing one at time, once they've been calcul
 
 The script above might look a bit overwhelming. But actually there are only a few things which have been added compared to the commands which were typed in for one raster dataset. 
 
-1. *import glob:*
+1. **import glob:**
 The glob module allows us to search for certain files within a directory based on how they are named. So, we can use it to search for all geotiff files which start with `nt_2014`. The output from this is a list of files `data_listing`, ie.
 ```python
 data_listing = glob.glob('{}nt_2014*.tif'.format(data_dir))
 ```
-
-2. *import os:*
+2. **import os:**
 The os module allows us to perform file operations. We have used it in this script to select only the file name (basename) from a file path, ie:
 ```python
 raster_name = os.path.basename(data)
 ```
-
-3. *arcpy.CreateTable_management():*
+3. **arcpy.CreateTable_management():**
 Here we are creating a table in the the geodatabse to store the results from the area calculation. We are also checking that the table does not already exist before creating it, ie.
 ```python
 if not arcpy.Exists('extent_results'):
@@ -218,8 +216,7 @@ if not arcpy.Exists('extent_results'):
     arcpy.AddField_management("extent_results", 'data_source', "TEXT")
     arcpy.AddField_management("extent_results", 'area', "DOUBLE")
 ```
-
-4. *for data in data_listing:*
+4. **for data in data_listing:**
 This represents the start of the loop, which takes each file path in the `data_listing` list and performs the GIS operations on each raster file. 
 
 
