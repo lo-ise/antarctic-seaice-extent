@@ -3,11 +3,11 @@ A tutorial to calculate Antarctic Sea Ice extent from a timeseries of Sea Ice co
 
 ## Introduction
 
-This exercise presents a way you might want to calculate sea ice extent from sea ice concentration data, using ArcGIS.
+This exercise presents a method to calculate sea ice extent from sea ice concentration data, using ArcGIS.
 
-The exercise will begin by showing a flow of commands to go from reading in the sea ice concentration data, to ending up with a calculation of the area. It will demonstrate this on one single band raster dataset. 
+The exercise will begin by introducing a chain of operations to go from reading in the sea ice concentration data, to outputting a calculation of the area. It will first demonstrate this on one single band raster dataset. 
 
-The exercise will show how to do this by typing commands into the Python prompt in ArcGIS Desktop. 
+The operations will be executing using the Python prompt in ArcGIS Desktop. 
 
 It will go on to show how to perform the same commands on any number of datasets. Why? Because the dataset we are using for this is actually 33 years long. 33 years times 365 days (give or take a few leap years and data gaps), is 12045 single band rasters. 
 
@@ -29,9 +29,30 @@ Coding / Scripting
 
 ESRI ArcGIS 10, 10.1, 10.2 or ArcGIS Pro with Spatial Analyst extension
 
+## What is sea ice and why is it important
+
+Sea ice is literally frozen sea water. Monitoring how the extent changes over time can provide indications of how climate change is effecting the polar regions.
+
+Here are some great links to learn more about sea ice. 
+
+* [All about sea ice by NSIDC](https://nsidc.org/cryosphere/seaice/index.html)
+
+* [A short video constrasting Arctic and Antarctic sea ice trends](https://www.youtube.com/watch?time_continue=102&v=J_WWXGGWZBE)
+
+* [View Sentinel-1 SAR imagery and see what current sea ice conditions are like in the Antarctic](http://www.polarview.aq/antarctic)
+
+* [Polar bear habitats](http://wwf.panda.org/what_we_do/where_we_work/arctic/wildlife/polar_bear/habitat/)
+ 
+
 ## The data source
 
+For this exercise, we will be using passive microwave radiometer data, from a dataset that goes back 33 years. 
 
+Objects on the earths surface emit microwave radiation at relatively low energy levels. The structure of ice typically emits more microwave radiation than the surrounding liquid water in the sea. Therefore, microwave radiometers can be used to detect the presence of sea ice. 
+
+One of the output data products provided by the National Snow and Ice Data Centre (NSIDC) is daily and monthly sea ice concentration grids that are available from 1979 to present. 
+
+We will be using the monthly data from 2014. 
 
 ## Project setup
 
@@ -66,7 +87,7 @@ Finally, `arcpy.env.overwriteOutput = True` prevents the annoyance of having to 
 
 In order to extract the sea ice extent from the dataset of sea ice concetration, we need to chain together a series of functions. To do this we will use ArcPy commands.
 
-Before that though, choose a raster from the `data` directory and add it to ArcMap. For this example we will use `nt_19810103_n07_v01_s.tif`
+Before that though, choose a raster from the `data` directory and add it to ArcMap. For this example we will use `nt_201401_f17_v1_1_s.tif` (January 2014).
 
 The workflow will be:
 
@@ -82,25 +103,25 @@ import numpy
 from arcpy.sa import *
 
 ```
-Here we are simply importing some extra python functionality which allows us to easily total up the polygon areas at the end.. we will come to this...
+Here we are simply importing [NumPy](http://www.numpy.org/), which is giving us some extra python functionality. 
 
-And we are importing all the ArcPy Spatial Analyst functions as well. Make sure you have this extension enabled. 
+And we are importing all the [ArcPy Spatial Analyst](http://pro.arcgis.com/en/pro-app/arcpy/spatial-analyst/what-is-the-spatial-analyst-module.htm) functions as well (`arcpy.sa`). Make sure you have this extension enabled. 
 
 ```python
-seaice_raster = Raster('nt_19810103_n07_v01_s.tif')
+seaice_raster = Raster('nt_201401_f17_v1_1_s.tif')
 seaice_mask = Con(seaice_raster >= 15, 1)
-seaice_mask.save('nt_19810103_n07_v01_s_mask')
+seaice_mask.save('nt_201401_f17_v1_1_s_mask')
 ```
 In this three lines we are creating a Raster object, pulling out all the cells whose values are 15 or above to a mask object, and finally saving the mask object to the geodatabase. 
 
 ```python
-arcpy.RasterToPolygon_conversion(seaice_mask, "nt_19810103_n07_v01_s_poly")
+arcpy.RasterToPolygon_conversion(seaice_mask, "nt_201401_f17_v1_1_s_mask_poly")
 ```
 
 This line converts the raster mask to a polygon feature class and saves it to the geodatabase.
 
 ```python
-area_field = arcpy.da.TableToNumPyArray("nt_19810103_n07_v01_s_poly", "Shape_Area")
+area_field = arcpy.da.TableToNumPyArray("nt_201401_f17_v1_1_s_mask_poly", "Shape_Area")
 total_area = area_field["Shape_Area"].sum()
 print total_area
 
