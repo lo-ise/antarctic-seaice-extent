@@ -36,13 +36,10 @@ Sea ice is literally frozen sea water. Monitoring how the extent changes over ti
 Here are some great links to learn more about sea ice. 
 
 * [All about sea ice by NSIDC](https://nsidc.org/cryosphere/seaice/index.html)
-
 * [A short video constrasting Arctic and Antarctic sea ice trends](https://www.youtube.com/watch?time_continue=102&v=J_WWXGGWZBE)
-
 * [View Sentinel-1 SAR imagery and see what current sea ice conditions are like in the Antarctic](http://www.polarview.aq/antarctic)
-
 * [Polar bear habitats](http://wwf.panda.org/what_we_do/where_we_work/arctic/wildlife/polar_bear/habitat/)
- 
+* [More on Arctic Sea Ice](http://earthobservatory.nasa.gov/Features/SeaIce/page3.php)
 
 ## The data source
 
@@ -131,26 +128,110 @@ These final few lines extract all the records in the `Shape_Area` field of the a
 
 ## Extracting sea ice extent from multiple grids
 
-As mentioned above, daily sea ice concentration data from this dataset goes back to 1978. However, for this exercise, we are just going to see how the sea ice extent changes over one year. We could take 365 data grids, but instead we are only going to take 24, from the 1st and 15th of every month. 
+As mentioned above, sea ice concentration data from this dataset goes back to 1979. 
 
-In the `data` directory, 
+Using the monthly data, we are going to calculate how sea ice extent changes over the course of 2014. We therefore need to calcualte extent for 12 grids.
 
-### We need to write a script
+It's quite tedious to copy and paste the above commands in for all 12 months, so we are now going to see how we can automate this processing using some Python scripting. 
 
-### We need somewhere to store the data
+The script simply will implement the above commands on each piece of data in turn by running a loop to iterate through each raster in turn. 
 
-## Extracting sea ice extent from any number of days of data
+
+### Create the script
+
+Type the following into a text editor, and save the file as `area_multiple_grid.py` (NB: make sure you keep the indents, they are 4 spaces long). 
+
+```python
+
+import arcpy
+from arcpy.sa import *
+
+import numpy
+import glob
+import os
+
+arcpy.env.workspace = 'e:/dev/antarctic-seaice-extent/antarctic_sea_ice.gdb'
+arcpy.env.scratchWorkspace = 'e:/dev/antarctic-seaice-extent/antarctic_sea_ice_scratch.gdb'
+arcpy.env.outputCoordinateSystem = arcpy.SpatialReference('South Pole Lambert Azimuthal Equal Area')
+arcpy.env.overwriteOutput = True
+
+data_dir = 'e:/dev/antarctic-seaice-extent/data_monthly/'
+data_listing = glob.glob('{}nt_2014*.tif'.format(data_dir))
+
+if not arcpy.Exists('extent_results'):
+    arcpy.CreateTable_management(arcpy.env.workspace, 'extent_results') 
+    arcpy.AddField_management("extent_results", 'data_source', "TEXT")
+    arcpy.AddField_management("extent_results", 'area', "DOUBLE")
+
+table_input = arcpy.da.InsertCursor('extent_results', ['data_source', 'area'])
+
+for data in data_listing:
+    raster_name = os.path.basename(data)
+    raster_name = raster_name.replace('.tif', '')
+    seaice_raster = Raster(data)
+    seaice_mask = Con(seaice_raster >= 15, 1)
+    seaice_mask.save("{}_mask".format(raster_name))
+    arcpy.RasterToPolygon_conversion(seaice_mask, "{}_mask_poly".format(raster_name))
+    area_field = arcpy.da.TableToNumPyArray("{}_mask_poly".format(raster_name), "Shape_Area")
+    total_area = area_field["Shape_Area"].sum()
+    table_input.insertRow([raster_name, total_area])
+
+del table_input
+
+```
+
+You will need to make a few changes to the directory paths to ensure the script is pointing to your working directory.
+
+Then to run thr script from the Python prompt, first remove all layers from the current ArcMap document and type...
+
+
+```python
+execfile('path_to_working_directory/area_multiple_grid.py')
+```
+
+... then wait.....
+
+You will see the extent polygons appearing one at time, once they've been calculated. 
+
+
+### Some explanations
+
+The script above might look a bit overwhelming. But actually there are only a few things which have been added compared to the commands which were typed in for one raster dataset. 
+
+1. *import glob:*
+The glob module allows us to search for certain files within a directory based on how they are named. So, we can use it to search for all geotiff files which start with `nt_2014`. The output from this is a list of files `data_listing`, ie.
+```python
+data_listing = glob.glob('{}nt_2014*.tif'.format(data_dir))
+```
+
+2. *import os:*
+The os module allows us to perform file operations. We have used it in this script to select only the file name (basename) from a file path, ie:
+```python
+raster_name = os.path.basename(data)
+```
+
+3. *arcpy.CreateTable_management():*
+Here we are creating a table in the the geodatabse to store the results from the area calculation. We are also checking that the table does not already exist before creating it, ie.
+```python
+if not arcpy.Exists('extent_results'):
+    arcpy.CreateTable_management(arcpy.env.workspace, 'extent_results')
+    arcpy.AddField_management("extent_results", 'data_source', "TEXT")
+    arcpy.AddField_management("extent_results", 'area', "DOUBLE")
+```
+
+4. *for data in data_listing:*
+This represents the start of the loop, which takes each file path in the `data_listing` list and performs the GIS operations on each raster file. 
+
+
 
 ## Final thoughts...
 
-If this is the first time you have tried scripting, don't worry. Try things, make mistakes, break things and work out why they aren't running. Play around with different ArcPy functions and enjoy. You can't break anything!
-
-Finally, watch out for typos!
+If this is the first time you have tried scripting, don't worry. Try things, make mistakes, break things and work out why they aren't running. Play around with different ArcPy functions and enjoy. You can't cause any damage. Final tip: watch out for typos.
 
 
 ## What can you do from here?
 
-Here are some ideas for ways to extend this porject, now that you have a script for extracting sea ice extent. 
+Here are some ideas for ways to extend this exercise, now that you have a script for extracting sea ice extent. 
 
 * Download [all the monthly data from NSIDC](https://nsidc.org/data/nsidc-0051), and run this script over the whole time series. 
 
