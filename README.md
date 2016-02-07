@@ -58,7 +58,7 @@ Objects on the earths surface emit microwave radiation at relatively low energy 
 
 One of the output data products provided by the National Snow and Ice Data Centre (NSIDC) is daily and monthly sea ice concentration rasters that are available from 1979 to present. 
 
-![Sea Ice January 2014](/images/sea-ice-2014-01.jpg)
+![Sea Ice January 2014](images/sea-ice-2014-01.jpg)
 
 
 To find out more information, or to access the raw data, visit the [data source webpages](http://nsidc.org/data/nsidc-0051).
@@ -150,7 +150,7 @@ These final few lines extract all the records in the `Shape_Area` field of the a
 
 The result will be a printed area, a raster mask and a polygon mask.
 
-![Data renders](/images/data-renders.jpg)
+![Data renders](images/data-renders.jpg)
 
 ## Extracting sea ice extent from multiple grids
 
@@ -283,4 +283,4 @@ data_listing = glob.glob('{}nt_1984*.tif'.format(data_dir))
 
 ## Reference
 
-Cavalieri, D. J., C. L. Parkinson, P. Gloersen, and H. J. Zwally. 1996, updated yearly. Sea Ice Concentrations from Nimbus-7 SMMR and DMSP SSM/I-SSMIS Passive Microwave Data, Version 1. [indicate subset used]. Boulder, Colorado USA. NASA National Snow and Ice Data Center Distributed Active Archive Center. http://dx.doi.org/10.5067/8GQ8LZQVL0VL. [Date Accessed].
+Cavalieri, D. J., C. L. Parkinson, P. Gloersen, and H. J. Zwally. 1996, updated yearly. Sea Ice Concentrations from Nimbus-7 SMMR and DMSP SSM/I-SSMIS Passive Microwave Data, Version 1. Boulder, Colorado USA. NASA National Snow and Ice Data Center Distributed Active Archive Center. http://dx.doi.org/10.5067/8GQ8LZQVL0VL. [Date Accessed: 2016-02-05].
