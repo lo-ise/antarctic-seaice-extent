@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="UTF-8">
+    <title>Antarctic-seaice-extent by lo-ise</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
+  </head>
+  <body>
+    <section class="page-header">
+      <h1 class="project-name">Antarctic-seaice-extent</h1>
+      <h2 class="project-tagline">A tutorial to calculate Antarctic Sea Ice extent from a timeseries of Sea Ice concentration data</h2>
+      <a href="https://github.com/lo-ise/antarctic-seaice-extent" class="btn">View on GitHub</a>
+      <a href="https://github.com/lo-ise/antarctic-seaice-extent/zipball/master" class="btn">Download .zip</a>
+      <a href="https://github.com/lo-ise/antarctic-seaice-extent/tarball/master" class="btn">Download .tar.gz</a>
+    </section>
+
+    <section class="main-content">
+      <h2>
+<a id="introduction" class="anchor" href="#introduction" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Introduction</h2>
+
+<p>This exercise presents a method to calculate sea ice extent from sea ice concentration data, using ArcGIS.</p>
+
+<p>The exercise will begin by introducing a chain of operations to go from reading in the sea ice concentration data, to outputting a calculation of the area. It will first demonstrate this on one single band raster dataset. </p>
+
+<p>The operations will be executing using the Python prompt in ArcGIS Desktop. </p>
+
+<p>It will go on to show how to perform the same commands on any number of datasets. </p>
+
+<h2>
+<a id="learning-outcomes" class="anchor" href="#learning-outcomes" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Learning outcomes</h2>
+
+<p>GIS based functions</p>
+
+<ul>
+<li>Raster conditional statements</li>
+<li>Awareness of choosing correct projections</li>
+<li>Area calculations</li>
+<li>Raster to vector conversions</li>
+</ul>
+
+<p>Datasets</p>
+
+<ul>
+<li>Working with high temporal resolution data</li>
+<li>Gain an understand for available data on sea ice derived from remote sensing instruments</li>
+</ul>
+
+<p>Coding / Scripting</p>
+
+<ul>
+<li>An introduction to scripting in ArcGIS using ArcPy (Python library). </li>
+</ul>
+
+<h2>
+<a id="tools-required" class="anchor" href="#tools-required" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Tools required</h2>
+
+<p>ESRI ArcGIS 10, 10.1, 10.2 or ArcGIS Pro with Spatial Analyst extension</p>
+
+<h2>
+<a id="what-is-sea-ice-and-why-is-it-important" class="anchor" href="#what-is-sea-ice-and-why-is-it-important" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>What is sea ice and why is it important</h2>
+
+<p>Sea ice is literally frozen sea water. Monitoring how the extent changes over time can provide indications of how climate change is effecting the polar regions.</p>
+
+<p>Here are some links to learn more about sea ice. </p>
+
+<ul>
+<li><a href="https://nsidc.org/cryosphere/seaice/index.html">All about sea ice by NSIDC</a></li>
+<li><a href="https://www.youtube.com/watch?time_continue=102&amp;v=J_WWXGGWZBE">A short video constrasting Arctic and Antarctic sea ice trends</a></li>
+<li><a href="http://www.polarview.aq/antarctic">View Sentinel-1 SAR imagery and see what current sea ice conditions are like in the Antarctic</a></li>
+<li><a href="http://wwf.panda.org/what_we_do/where_we_work/arctic/wildlife/polar_bear/habitat/">Polar bear habitats</a></li>
+<li><a href="http://earthobservatory.nasa.gov/Features/SeaIce/page3.php">More on Arctic Sea Ice</a></li>
+</ul>
+
+<p><img src="images/sea-ice-4.jpg" alt="Sea ice">
+<img src="images/sea-ice-3.jpg" alt="Sea ice">
+<img src="images/sea-ice-2.jpg" alt="Sea ice">
+<img src="images/sea-ice-1.jpg" alt="Sea ice"></p>
+
+<h2>
+<a id="the-data-source" class="anchor" href="#the-data-source" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>The data source</h2>
+
+<p>For this exercise, we will be using passive microwave radiometer data, from a continuous dataset that goes back to 1979. </p>
+
+<p>Objects on the earths surface emit microwave radiation at relatively low energy levels. The structure of ice typically emits more microwave radiation than the surrounding liquid water in the sea. Therefore, microwave radiometers can be used to detect the presence of sea ice. </p>
+
+<p>One of the output data products provided by the National Snow and Ice Data Centre (NSIDC) is daily and monthly sea ice concentration rasters that are available from 1979 to present. </p>
+
+<p><img src="/images/sea-ice-2014-01.jpg" alt="Sea Ice January 2014"></p>
+
+<p>To find out more information, or to access the raw data, visit the <a href="http://nsidc.org/data/nsidc-0051">data source webpages</a>.</p>
+
+<p>Sea ice extent is monitored and calculated on a daily basis by the NSIDC using this data and the output of this is the <a href="http://nsidc.org/data/seaice_index/">Sea Ice Index</a>. The convention is that any cell within the sea ice concetration grids that is above 15% is classed as ice covered and therefore is counted towards the sea ice extent calculation. </p>
+
+<p>We will be using the monthly sea ice concetration data from 2014 to see how it is possible to calculated sea ice extent using ArcGIS. </p>
+
+<h2>
+<a id="project-setup" class="anchor" href="#project-setup" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Project setup</h2>
+
+<ol>
+<li><p>Create a working directory.</p></li>
+<li><p>You may optionally wish to seek out Antarctic coastline data from the <a href="http://www.add.scar.org/home/add7">Antarctic Digital Database</a>.</p></li>
+<li><p>Download the sea ice concentration data <a href="https://www.dropbox.com/s/5wjfsrzitthibj1/data_monthly.zip?dl=0">from here</a>. Unzip the <code>data_monthly.zip</code> directory into the working directory.</p></li>
+<li><p>Open ArcMap.</p></li>
+<li><p>Using ArcCatalog, create two file geodatabases in the working directory called <code>antarctic-sea-ice.gdb</code> and <code>antarctic-sea-ice-scratch.gdb</code>.</p></li>
+<li><p>Open up the Python prompt and type the following:</p></li>
+</ol>
+
+<div class="highlight highlight-source-python"><pre>arcpy.env.workspace <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">'</span>path-to-working-directory/antarctic-sea-ice.gdb<span class="pl-pds">'</span></span>
+arcpy.env.scratchWorkspace <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">'</span>path-to-working-directory/antarctic-sea-ice-scratch.gdb<span class="pl-pds">'</span></span>
+arcpy.env.outputCoordinateSystem <span class="pl-k">=</span> arcpy.SpatialReference(<span class="pl-s"><span class="pl-pds">'</span>South Pole Lambert Azimuthal Equal Area<span class="pl-pds">'</span></span>)
+arcpy.env.overwriteOutput <span class="pl-k">=</span> <span class="pl-c1">True</span>
+</pre></div>
+
+<p>Note that <code>path-to-working-directory</code> should be replaced with the actual path you the working directory that was created in step number 1, ie. <code>c:/working-dir/</code> or something similar. </p>
+
+<p>The above commands are simply setting the processing environment for the operations that will be conducted. </p>
+
+<p><code>arcpy.env.workspace</code> is the default workspace that all outputs will be saved to. The <code>arcpy.env.scratchWorkspace</code> is for all the temporary files that ArcGIS might create during the processing. </p>
+
+<p><code>arcpy.env.outputCoordinateSystem</code> simply ensures that all outputs will be converted to an equal area projection,South Polar Lambert Azimuthal Equal Area. We will be calucating areas, so it is important to ensure we calculate on an equal area projection. </p>
+
+<p>Finally, <code>arcpy.env.overwriteOutput = True</code> prevents the annoyance of having to delete outputs from the database before repeats of the same process are completed.  </p>
+
+<h2>
+<a id="extracting-area-of-sea-ice-extent-from-one-piece-of-data" class="anchor" href="#extracting-area-of-sea-ice-extent-from-one-piece-of-data" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Extracting area of sea ice extent from one piece of data</h2>
+
+<p>In order to extract the sea ice extent from the dataset of sea ice concentration, we need to chain together a series of functions. To do this we will use ArcPy commands.</p>
+
+<p>Before that though, choose a raster from the <code>data_monthly</code> directory and add it to ArcMap. For this example we will use <code>nt_201401_f17_v1_1_s.tif</code> (January 2014).</p>
+
+<p>The workflow will be:</p>
+
+<ol>
+<li>Load in the raster data into an ArcPy object.</li>
+<li>Use raster conditional statement within the ArcGIS Spatial Analyst extension, to extract all cells that are 15% or above using a <a href="http://help.arcgis.com/EN/ArcGISDesktop/10.0/Help/index.html#//009z00000005000000.htm">conditional statement</a>, indicating the extent of sea ice, and output a raster mask with all sea ice cells with the value of 1.</li>
+<li>Convert the raster to a polygon feature class. Note, there might be more than one polygon feature. </li>
+<li>Total up the areas of the polygons within the feature class. </li>
+</ol>
+
+<p>Type the following into the Python prompt:</p>
+
+<div class="highlight highlight-source-python"><pre><span class="pl-k">import</span> numpy
+<span class="pl-k">from</span> arcpy.sa <span class="pl-k">import</span> <span class="pl-k">*</span>
+</pre></div>
+
+<p>Here we are simply importing <a href="http://www.numpy.org/">NumPy</a>, which is giving us some extra python functionality. </p>
+
+<p>And we are importing all the <a href="http://pro.arcgis.com/en/pro-app/arcpy/spatial-analyst/what-is-the-spatial-analyst-module.htm">ArcPy Spatial Analyst</a> functions as well (<code>arcpy.sa</code>). Make sure you have this extension enabled. </p>
+
+<div class="highlight highlight-source-python"><pre>seaice_raster <span class="pl-k">=</span> Raster(<span class="pl-s"><span class="pl-pds">'</span>nt_201401_f17_v1_1_s.tif<span class="pl-pds">'</span></span>)
+seaice_mask <span class="pl-k">=</span> Con(seaice_raster <span class="pl-k">&gt;=</span> <span class="pl-c1">15</span>, <span class="pl-c1">1</span>)
+seaice_mask.save(<span class="pl-s"><span class="pl-pds">'</span>nt_201401_f17_v1_1_s_mask<span class="pl-pds">'</span></span>)</pre></div>
+
+<p>In this three lines we are creating a Raster object, pulling out all the cells whose values are 15 or above to a mask object (<code>Con(seaice_raster &gt;= 15, 1)</code>), and finally saving the mask object to the geodatabase. </p>
+
+<div class="highlight highlight-source-python"><pre>arcpy.RasterToPolygon_conversion(seaice_mask, <span class="pl-s"><span class="pl-pds">"</span>nt_201401_f17_v1_1_s_mask_poly<span class="pl-pds">"</span></span>)</pre></div>
+
+<p>This line converts the raster mask to a polygon feature class and saves it to the geodatabase.</p>
+
+<div class="highlight highlight-source-python"><pre>area_field <span class="pl-k">=</span> arcpy.da.TableToNumPyArray(<span class="pl-s"><span class="pl-pds">"</span>nt_201401_f17_v1_1_s_mask_poly<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>Shape_Area<span class="pl-pds">"</span></span>)
+total_area <span class="pl-k">=</span> area_field[<span class="pl-s"><span class="pl-pds">"</span>Shape_Area<span class="pl-pds">"</span></span>].sum()
+<span class="pl-c1">print</span> total_area
+</pre></div>
+
+<p>These final few lines extract all the records in the <code>Shape_Area</code> field of the attribute table, which is already calculated in the previous step by default. It them sums these values which give us <code>total_area</code>. </p>
+
+<p>The result will be a printed area, a raster mask and a polygon mask.</p>
+
+<p><img src="/images/data-renders.jpg" alt="Data renders"></p>
+
+<h2>
+<a id="extracting-sea-ice-extent-from-multiple-grids" class="anchor" href="#extracting-sea-ice-extent-from-multiple-grids" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Extracting sea ice extent from multiple grids</h2>
+
+<p>As mentioned above, sea ice concentration data from this dataset goes back to 1979. </p>
+
+<p>Using the monthly data, we are going to calculate how sea ice extent changes over the course of 2014. We therefore need to calculate extent for 12 grids.</p>
+
+<p>It's quite tedious to copy and paste the above commands in for all 12 months, so we are now going to see how we can automate this processing using some Python scripting. </p>
+
+<p>The script will implement the above commands on each piece of data in turn by running a loop to iterate through each raster in turn. </p>
+
+<h3>
+<a id="create-the-script" class="anchor" href="#create-the-script" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Create the script</h3>
+
+<p>Type the following into a text editor, and save the file as <code>extent_multiple_grid.py</code> (NB: make sure you keep the indents, they are 4 spaces long). </p>
+
+<div class="highlight highlight-source-python"><pre>
+<span class="pl-k">import</span> arcpy
+<span class="pl-k">from</span> arcpy.sa <span class="pl-k">import</span> <span class="pl-k">*</span>
+
+<span class="pl-k">import</span> numpy
+<span class="pl-k">import</span> glob
+<span class="pl-k">import</span> os
+
+arcpy.env.workspace <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">'</span>e:/dev/antarctic-seaice-extent/antarctic_sea_ice.gdb<span class="pl-pds">'</span></span>
+arcpy.env.scratchWorkspace <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">'</span>e:/dev/antarctic-seaice-extent/antarctic_sea_ice_scratch.gdb<span class="pl-pds">'</span></span>
+arcpy.env.outputCoordinateSystem <span class="pl-k">=</span> arcpy.SpatialReference(<span class="pl-s"><span class="pl-pds">'</span>South Pole Lambert Azimuthal Equal Area<span class="pl-pds">'</span></span>)
+arcpy.env.overwriteOutput <span class="pl-k">=</span> <span class="pl-c1">True</span>
+
+data_dir <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">'</span>e:/dev/antarctic-seaice-extent/data_monthly/<span class="pl-pds">'</span></span>
+data_listing <span class="pl-k">=</span> glob.glob(<span class="pl-s"><span class="pl-pds">'</span><span class="pl-c1">{}</span>nt_2014*.tif<span class="pl-pds">'</span></span>.format(data_dir))
+
+<span class="pl-k">if</span> <span class="pl-k">not</span> arcpy.Exists(<span class="pl-s"><span class="pl-pds">'</span>extent_results<span class="pl-pds">'</span></span>):
+    arcpy.CreateTable_management(arcpy.env.workspace, <span class="pl-s"><span class="pl-pds">'</span>extent_results<span class="pl-pds">'</span></span>) 
+    arcpy.AddField_management(<span class="pl-s"><span class="pl-pds">"</span>extent_results<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">'</span>data_source<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">"</span>TEXT<span class="pl-pds">"</span></span>)
+    arcpy.AddField_management(<span class="pl-s"><span class="pl-pds">"</span>extent_results<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">'</span>area<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">"</span>DOUBLE<span class="pl-pds">"</span></span>)
+
+table_input <span class="pl-k">=</span> arcpy.da.InsertCursor(<span class="pl-s"><span class="pl-pds">'</span>extent_results<span class="pl-pds">'</span></span>, [<span class="pl-s"><span class="pl-pds">'</span>data_source<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>area<span class="pl-pds">'</span></span>])
+
+<span class="pl-k">for</span> data <span class="pl-k">in</span> data_listing:
+    raster_name <span class="pl-k">=</span> os.path.basename(data)
+    raster_name <span class="pl-k">=</span> raster_name.replace(<span class="pl-s"><span class="pl-pds">'</span>.tif<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span><span class="pl-pds">'</span></span>)
+    seaice_raster <span class="pl-k">=</span> Raster(data)
+    seaice_mask <span class="pl-k">=</span> Con(seaice_raster <span class="pl-k">&gt;=</span> <span class="pl-c1">15</span>, <span class="pl-c1">1</span>)
+    seaice_mask.save(<span class="pl-s"><span class="pl-pds">"</span><span class="pl-c1">{}</span>_mask<span class="pl-pds">"</span></span>.format(raster_name))
+    arcpy.RasterToPolygon_conversion(seaice_mask, <span class="pl-s"><span class="pl-pds">"</span><span class="pl-c1">{}</span>_mask_poly<span class="pl-pds">"</span></span>.format(raster_name))
+    area_field <span class="pl-k">=</span> arcpy.da.TableToNumPyArray(<span class="pl-s"><span class="pl-pds">"</span><span class="pl-c1">{}</span>_mask_poly<span class="pl-pds">"</span></span>.format(raster_name), <span class="pl-s"><span class="pl-pds">"</span>Shape_Area<span class="pl-pds">"</span></span>)
+    total_area <span class="pl-k">=</span> area_field[<span class="pl-s"><span class="pl-pds">"</span>Shape_Area<span class="pl-pds">"</span></span>].sum()
+    table_input.insertRow([raster_name, total_area])
+
+<span class="pl-k">del</span> table_input
+</pre></div>
+
+<p>You will need to make a few changes to the directory paths to ensure the script is pointing to your working directory.</p>
+
+<p>Then to run the script from the Python prompt, first remove all layers from the current ArcMap document and type...</p>
+
+<div class="highlight highlight-source-python"><pre><span class="pl-v">execfile</span>(<span class="pl-s"><span class="pl-pds">'</span>path_to_working_directory/extent_multiple_grid.py<span class="pl-pds">'</span></span>)</pre></div>
+
+<p>... then wait.....</p>
+
+<p>You will see the extent polygons appearing one at time, once they've been calculated. </p>
+
+<h3>
+<a id="some-explanations" class="anchor" href="#some-explanations" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Some explanations</h3>
+
+<p>The script above might look a bit overwhelming. But actually there are only a few things which are additional to the commands which were typed in for one raster dataset. </p>
+
+<ol>
+<li>
+<p><strong>import glob:</strong>
+The glob module allows us to search for certain files within a directory based on how they are named. So, we can use it to search for all geotiff files which start with <code>nt_2014</code>. The output from this is a list of files <code>data_listing</code>, ie.</p>
+
+<div class="highlight highlight-source-python"><pre>data_listing <span class="pl-k">=</span> glob.glob(<span class="pl-s"><span class="pl-pds">'</span><span class="pl-c1">{}</span>nt_2014*.tif<span class="pl-pds">'</span></span>.format(data_dir))</pre></div>
+</li>
+<li>
+<p><strong>import os:</strong>
+The os module allows us to perform file operations. We have used it in this script to select only the file name (basename) from a file path, ie.</p>
+
+<div class="highlight highlight-source-python"><pre>raster_name <span class="pl-k">=</span> os.path.basename(data)</pre></div>
+</li>
+<li>
+<p><strong>arcpy.CreateTable_management():</strong>
+Here we are creating a table in the the geodatabase to store the results from the area calculation. We are also checking that the table does not already exist before creating it, ie.</p>
+
+<div class="highlight highlight-source-python"><pre><span class="pl-k">if</span> <span class="pl-k">not</span> arcpy.Exists(<span class="pl-s"><span class="pl-pds">'</span>extent_results<span class="pl-pds">'</span></span>):
+    arcpy.CreateTable_management(arcpy.env.workspace, <span class="pl-s"><span class="pl-pds">'</span>extent_results<span class="pl-pds">'</span></span>)
+    arcpy.AddField_management(<span class="pl-s"><span class="pl-pds">"</span>extent_results<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">'</span>data_source<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">"</span>TEXT<span class="pl-pds">"</span></span>)
+    arcpy.AddField_management(<span class="pl-s"><span class="pl-pds">"</span>extent_results<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">'</span>area<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">"</span>DOUBLE<span class="pl-pds">"</span></span>)</pre></div>
+</li>
+<li><p><strong>for data in data_listing:</strong>
+This represents the start of the loop, which takes each file path in the <code>data_listing</code> list and performs the GIS operations on each raster file. </p></li>
+</ol>
+
+<h2>
+<a id="final-thoughts" class="anchor" href="#final-thoughts" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Final thoughts...</h2>
+
+<p>If this is the first time you have tried scripting, don't worry. Try things, make mistakes, break things and work out why they aren't running. Play around with different ArcPy functions and enjoy. You can't cause any damage. Final tip: watch out for typos.</p>
+
+<h2>
+<a id="what-can-you-do-from-here" class="anchor" href="#what-can-you-do-from-here" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>What can you do from here?</h2>
+
+<p>Here are some ideas for ways to extend this exercise, now that you have a script for extracting sea ice extent. </p>
+
+<ul>
+<li><p>Download <a href="https://nsidc.org/data/nsidc-0051">all the monthly data from NSIDC</a>, and run this script over the whole time series. </p></li>
+<li><p>Download all the daily data from the timeseries and run this script over all available days, one day for each year, one month, or whatever you choose. To do this, just select the day/month/year of rasters you want by ammending this line in <code>area_multiple_grid.py</code>:</p></li>
+</ul>
+
+<div class="highlight highlight-source-python"><pre><span class="pl-c"># ie. 1st September for every year</span>
+data_listing <span class="pl-k">=</span> glob.glob(<span class="pl-s"><span class="pl-pds">'</span><span class="pl-c1">{}</span>nt_????0901*.tif<span class="pl-pds">'</span></span>.format(data_dir))
+
+<span class="pl-c"># ie. all rasters available for the year 1984</span>
+data_listing <span class="pl-k">=</span> glob.glob(<span class="pl-s"><span class="pl-pds">'</span><span class="pl-c1">{}</span>nt_1984*.tif<span class="pl-pds">'</span></span>.format(data_dir))
+</pre></div>
+
+<ul>
+<li><p>Graph out the results</p></li>
+<li><p>Create a time attribute on the polygon features and run animations. </p></li>
+<li><p>Calculate the extent of ice that is classified as over 50% concentration. </p></li>
+</ul>
+
+<h2>
+<a id="reference" class="anchor" href="#reference" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Reference</h2>
+
+<p>Cavalieri, D. J., C. L. Parkinson, P. Gloersen, and H. J. Zwally. 1996, updated yearly. Sea Ice Concentrations from Nimbus-7 SMMR and DMSP SSM/I-SSMIS Passive Microwave Data, Version 1. [indicate subset used]. Boulder, Colorado USA. NASA National Snow and Ice Data Center Distributed Active Archive Center. <a href="http://dx.doi.org/10.5067/8GQ8LZQVL0VL">http://dx.doi.org/10.5067/8GQ8LZQVL0VL</a>. [Date Accessed].</p>
+
+      <footer class="site-footer">
+        <span class="site-footer-owner"><a href="https://github.com/lo-ise/antarctic-seaice-extent">Antarctic-seaice-extent</a> is maintained by <a href="https://github.com/lo-ise">lo-ise</a>.</span>
+
+        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
+      </footer>
+
+    </section>
+
+  
+  </body>
+</html>
