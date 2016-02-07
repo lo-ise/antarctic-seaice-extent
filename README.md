@@ -143,9 +143,7 @@ These final few lines extract all the records in the `Shape_Area` field of the a
 
 The result will be a printed area, a raster mask and a polygon mask.
 
-|![concentration](/images/sea-ice-concentration.png)|![mask](/images/sea-ice-mask.png) |![poly](/images/sea-ice-poly.png) |
-|concentration| raster mask| polygon mask|
-
+![Data renders](/images/data-renders.jpg)
 
 ## Extracting sea ice extent from multiple grids
 
