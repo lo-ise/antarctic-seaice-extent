@@ -63,7 +63,7 @@ One of the output data products provided by the National Snow and Ice Data Centr
 
 To find out more information, or to access the raw data, visit the [data source webpages](http://nsidc.org/data/nsidc-0051).
 
-Sea ice extent is monitored and calculated on a daily basis by the NSIDC using this data. The output of this is the [Sea Ice Index](http://nsidc.org/data/seaice_index/). The convention is that any cell within the sea ice concetration grids that is above 15% is classed as ice covered and therefore is counted towards the sea ice extent calculation. 
+Sea ice extent is monitored and calculated on a daily basis by the NSIDC using this data. The output of this is the [Sea Ice Index](http://nsidc.org/data/seaice_index/). The convention is that any cell within the sea ice concentration grids that is above 15% is classed as ice covered and therefore is counted towards the sea ice extent calculation. 
 
 
 We will be using the monthly sea ice concentration data from 2014 to see how it is possible to calculated sea ice extent using ArcGIS. 
