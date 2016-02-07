@@ -20,7 +20,8 @@ GIS based functions
 * Raster to vector conversions
 
 Datasets
-* Working with high temporal resolution datasets
+* Working with high temporal resolution data
+* Gain an understand for available data on sea ice derived from remote sensing instruments
 
 Coding / Scripting
 * An introduction to scripting in ArcGIS using ArcPy (Python library). 
@@ -33,7 +34,7 @@ ESRI ArcGIS 10, 10.1, 10.2 or ArcGIS Pro with Spatial Analyst extension
 
 Sea ice is literally frozen sea water. Monitoring how the extent changes over time can provide indications of how climate change is effecting the polar regions.
 
-Here are some great links to learn more about sea ice. 
+Here are some links to learn more about sea ice. 
 
 * [All about sea ice by NSIDC](https://nsidc.org/cryosphere/seaice/index.html)
 * [A short video constrasting Arctic and Antarctic sea ice trends](https://www.youtube.com/watch?time_continue=102&v=J_WWXGGWZBE)
@@ -44,33 +45,36 @@ Here are some great links to learn more about sea ice.
 
 ## The data source
 
-For this exercise, we will be using passive microwave radiometer data, from a dataset that goes back 33 years. 
+For this exercise, we will be using passive microwave radiometer data, from a continuous dataset that goes back to 1979. 
 
 Objects on the earths surface emit microwave radiation at relatively low energy levels. The structure of ice typically emits more microwave radiation than the surrounding liquid water in the sea. Therefore, microwave radiometers can be used to detect the presence of sea ice. 
 
-One of the output data products provided by the National Snow and Ice Data Centre (NSIDC) is daily and monthly sea ice concentration grids that are available from 1979 to present. 
+One of the output data products provided by the National Snow and Ice Data Centre (NSIDC) is daily and monthly sea ice concentration rasters that are available from 1979 to present. 
 
 ![Sea Ice January 2014](/images/sea-ice-2014-01.jpg)
 
-We will be using the monthly data from 2014. 
 
 To find out more information, or to access the raw data, visit the [data source webpages](http://nsidc.org/data/nsidc-0051).
 
-Sea ice extent is monitored on a daily basis by the NSIDC and the output of this is the [Sea Ice Index](http://nsidc.org/data/seaice_index/). The convention is that any cell within the sea ice concetration grids that is above 15% is classed as ice covered and therefore is counted towards the sea ice extent calculation. 
+Sea ice extent is monitored and calculated on a daily basis by the NSIDC using this data and the output of this is the [Sea Ice Index](http://nsidc.org/data/seaice_index/). The convention is that any cell within the sea ice concetration grids that is above 15% is classed as ice covered and therefore is counted towards the sea ice extent calculation. 
 
-But you will see how it can be calculated from the raw data using GIS. 
+
+We will be using the monthly sea ice concetration data from 2014 to see how it is possible to calculated sea ice extent using ArcGIS. 
+
 
 
 
 ## Project setup
 
-1. Create a working directory
+1. Create a working directory.
 
-2. Download the data [from here](https://www.dropbox.com/s/5wjfsrzitthibj1/data_monthly.zip?dl=0). Unzip the `data_monthly.zip` directory into the working directory.
+1. You may optionally wish to seek out Antarctic coastline data from the [Antarctic Digital Database](http://www.add.scar.org/home/add7).
 
-3. Open ArcMap
+2. Download the sea ice concentration data [from here](https://www.dropbox.com/s/5wjfsrzitthibj1/data_monthly.zip?dl=0). Unzip the `data_monthly.zip` directory into the working directory.
 
-4. Using ArcCatalog, create two file geodatabases in the working directory called `antarctic-sea-ice.gdb` and `antarctic-sea-ice-scratch.gdb`
+3. Open ArcMap.
+
+4. Using ArcCatalog, create two file geodatabases in the working directory called `antarctic-sea-ice.gdb` and `antarctic-sea-ice-scratch.gdb`.
 
 5. Open up the Python prompt and type the following:
 ```python
@@ -136,6 +140,12 @@ print total_area
 ```
 
 These final few lines extract all the records in the `Shape_Area` field of the attribute table, which is already calculated in the previous step by default. It them sums these values which give us `total_area`. 
+
+The result will be a printed area, a raster mask and a polygon mask.
+
+|![concentration](/images/sea-ice-concentration.png)|![mask](/images/sea-ice-mask.png) |![poly](/images/sea-ice-poly.png) |
+|concentration| raster mask| polygon mask|
+
 
 ## Extracting sea ice extent from multiple grids
 
