@@ -9,7 +9,7 @@ The exercise will begin by introducing a chain of operations to go from reading 
 
 The operations will be executing using the Python prompt in ArcGIS Desktop. 
 
-It will go on to show how to perform the same commands on any number of datasets. Why? Because the dataset we are using for this is actually 33 years long. 33 years times 365 days (give or take a few leap years and data gaps), is 12045 single band rasters. 
+It will go on to show how to perform the same commands on any number of datasets. 
 
 ## Learning outcomes
 
@@ -76,7 +76,7 @@ But you will see how it can be calculated from the raw data using GIS.
 ```python
 arcpy.env.workspace = 'path-to-working-directory/antarctic-sea-ice.gdb'
 arcpy.env.scratchWorkspace = 'path-to-working-directory/antarctic-sea-ice-scratch.gdb'
-arcpy.env.outputCoordinateSystem = arcpy.SpatialReference(102020)
+arcpy.env.outputCoordinateSystem = arcpy.SpatialReference('South Pole Lambert Azimuthal Equal Area')
 arcpy.env.overwriteOutput = True
 
 ```
@@ -86,22 +86,22 @@ The above commands are simply setting the processing environment for the operati
 
 `arcpy.env.workspace` is the default workspace that all outputs will be saved to. The `arcpy.env.scratchWorkspace` is for all the temporary files that ArcGIS might create during the processing. 
 
-`arcpy.env.outputCoordinateSystem` simply ensures that all outputs will be converted to an equal area projection. In this case EPSG 102020, which is South Polar Lambert Azimuthal Equal Area. We will be calucating areas, so it is important to ensure we calculate on an equal area projection. 
+`arcpy.env.outputCoordinateSystem` simply ensures that all outputs will be converted to an equal area projection,South Polar Lambert Azimuthal Equal Area. We will be calucating areas, so it is important to ensure we calculate on an equal area projection. 
 
 Finally, `arcpy.env.overwriteOutput = True` prevents the annoyance of having to delete outputs from the database before repeats of the same process are completed.  
 
 
 ## Extracting area of sea ice extent from one piece of data
 
-In order to extract the sea ice extent from the dataset of sea ice concetration, we need to chain together a series of functions. To do this we will use ArcPy commands.
+In order to extract the sea ice extent from the dataset of sea ice concentration, we need to chain together a series of functions. To do this we will use ArcPy commands.
 
-Before that though, choose a raster from the `data` directory and add it to ArcMap. For this example we will use `nt_201401_f17_v1_1_s.tif` (January 2014).
+Before that though, choose a raster from the `data_monthly` directory and add it to ArcMap. For this example we will use `nt_201401_f17_v1_1_s.tif` (January 2014).
 
 The workflow will be:
 
 1. Load in the raster data into an ArcPy object.
-2. Use raster conditional statement within the ArcGIS Spatial Analyst extension, to extract all cells that are 15% or above, indicating the extent of sea ice, and output a raster mask with all sea ice cells with the value of 1.
-3. Convert the raster to a polygon feature class. Note, there might be more than one polygon geometry. 
+2. Use raster conditional statement within the ArcGIS Spatial Analyst extension, to extract all cells that are 15% or above using a [conditional statement](http://help.arcgis.com/EN/ArcGISDesktop/10.0/Help/index.html#//009z00000005000000.htm), indicating the extent of sea ice, and output a raster mask with all sea ice cells with the value of 1.
+3. Convert the raster to a polygon feature class. Note, there might be more than one polygon feature. 
 4. Total up the areas of the polygons within the feature class. 
 
 Type the following into the Python prompt:
@@ -120,7 +120,7 @@ seaice_raster = Raster('nt_201401_f17_v1_1_s.tif')
 seaice_mask = Con(seaice_raster >= 15, 1)
 seaice_mask.save('nt_201401_f17_v1_1_s_mask')
 ```
-In this three lines we are creating a Raster object, pulling out all the cells whose values are 15 or above to a mask object, and finally saving the mask object to the geodatabase. 
+In this three lines we are creating a Raster object, pulling out all the cells whose values are 15 or above to a mask object (`Con(seaice_raster >= 15, 1)`), and finally saving the mask object to the geodatabase. 
 
 ```python
 arcpy.RasterToPolygon_conversion(seaice_mask, "nt_201401_f17_v1_1_s_mask_poly")
@@ -135,17 +135,17 @@ print total_area
 
 ```
 
-These final few lines extract all the records in the `Shape_Area` field of the attribute table, which is already calculated in the previous step by default. It them sums these values which give is `total_area`. 
+These final few lines extract all the records in the `Shape_Area` field of the attribute table, which is already calculated in the previous step by default. It them sums these values which give us `total_area`. 
 
 ## Extracting sea ice extent from multiple grids
 
 As mentioned above, sea ice concentration data from this dataset goes back to 1979. 
 
-Using the monthly data, we are going to calculate how sea ice extent changes over the course of 2014. We therefore need to calcualte extent for 12 grids.
+Using the monthly data, we are going to calculate how sea ice extent changes over the course of 2014. We therefore need to calculate extent for 12 grids.
 
 It's quite tedious to copy and paste the above commands in for all 12 months, so we are now going to see how we can automate this processing using some Python scripting. 
 
-The script simply will implement the above commands on each piece of data in turn by running a loop to iterate through each raster in turn. 
+The script will implement the above commands on each piece of data in turn by running a loop to iterate through each raster in turn. 
 
 
 ### Create the script
@@ -193,7 +193,7 @@ del table_input
 
 You will need to make a few changes to the directory paths to ensure the script is pointing to your working directory.
 
-Then to run thr script from the Python prompt, first remove all layers from the current ArcMap document and type...
+Then to run the script from the Python prompt, first remove all layers from the current ArcMap document and type...
 
 
 ```python
@@ -207,7 +207,7 @@ You will see the extent polygons appearing one at time, once they've been calcul
 
 ### Some explanations
 
-The script above might look a bit overwhelming. But actually there are only a few things which have been added compared to the commands which were typed in for one raster dataset. 
+The script above might look a bit overwhelming. But actually there are only a few things which are additional to the commands which were typed in for one raster dataset. 
 
 1. **import glob:**
 The glob module allows us to search for certain files within a directory based on how they are named. So, we can use it to search for all geotiff files which start with `nt_2014`. The output from this is a list of files `data_listing`, ie.
@@ -217,14 +217,14 @@ The glob module allows us to search for certain files within a directory based o
     ```
 
 2. **import os:**
-The os module allows us to perform file operations. We have used it in this script to select only the file name (basename) from a file path, ie:
+The os module allows us to perform file operations. We have used it in this script to select only the file name (basename) from a file path, ie.
 
     ```python
     raster_name = os.path.basename(data)
     ```
 
 3. **arcpy.CreateTable_management():**
-Here we are creating a table in the the geodatabse to store the results from the area calculation. We are also checking that the table does not already exist before creating it, ie.
+Here we are creating a table in the the geodatabase to store the results from the area calculation. We are also checking that the table does not already exist before creating it, ie.
 
     ```python
     if not arcpy.Exists('extent_results'):
