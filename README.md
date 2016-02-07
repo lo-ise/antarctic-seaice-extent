@@ -11,7 +11,6 @@ The operations will be executing using the Python prompt in ArcGIS Desktop.
 
 It will go on to show how to perform the same commands on any number of datasets. 
 
-![ Sea ice](images/sea-ice-3.jpg)
 
 ## Learning outcomes
 
@@ -28,7 +27,6 @@ Datasets
 Coding / Scripting
 * An introduction to scripting in ArcGIS using ArcPy (Python library). 
 
-![Sea ice](images/sea-ice-2.jpg)
 
 ## Tools required
 
@@ -48,6 +46,9 @@ Here are some links to learn more about sea ice.
 
 
 ![Sea ice](images/sea-ice-4.jpg)
+![Sea ice](images/sea-ice-3.jpg)
+![Sea ice](images/sea-ice-2.jpg)
+![Sea ice](images/sea-ice-1.jpg)
 
 ## The data source
 
