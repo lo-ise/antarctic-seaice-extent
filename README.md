@@ -5,11 +5,11 @@ A tutorial to calculate Antarctic Sea Ice extent from a timeseries of Sea Ice co
 
 This exercise presents a method to calculate sea ice extent from sea ice concentration data, using ArcGIS.
 
-The exercise will begin by introducing a chain of operations to go from reading in the sea ice concentration data, to outputting a calculation of the area. It will first demonstrate this on one single band raster dataset. 
+The exercise will begin by introducing a chain of operations to go from reading in the sea ice concentration data, to outputting a calculation of the extent. It will first demonstrate this on one single band raster dataset. 
 
 The operations will be executing using the Python prompt in ArcGIS Desktop. 
 
-It will go on to show how to perform the same commands on any number of datasets. 
+Finally, it will show how to perform the same commands on any number of datasets. 
 
 
 ## Learning outcomes
@@ -22,10 +22,10 @@ GIS based functions
 
 Datasets
 * Working with high temporal resolution data
-* Gain an understand for available data on sea ice derived from remote sensing instruments
+* Sea ice data products derived from remote sensing instruments
 
 Coding / Scripting
-* An introduction to scripting in ArcGIS using ArcPy (Python library). 
+* An introduction to scripting in ArcGIS using ArcPy (Python library)
 
 
 ## Tools required
@@ -63,13 +63,10 @@ One of the output data products provided by the National Snow and Ice Data Centr
 
 To find out more information, or to access the raw data, visit the [data source webpages](http://nsidc.org/data/nsidc-0051).
 
-Sea ice extent is monitored and calculated on a daily basis by the NSIDC using this data and the output of this is the [Sea Ice Index](http://nsidc.org/data/seaice_index/). The convention is that any cell within the sea ice concetration grids that is above 15% is classed as ice covered and therefore is counted towards the sea ice extent calculation. 
+Sea ice extent is monitored and calculated on a daily basis by the NSIDC using this data. The output of this is the [Sea Ice Index](http://nsidc.org/data/seaice_index/). The convention is that any cell within the sea ice concetration grids that is above 15% is classed as ice covered and therefore is counted towards the sea ice extent calculation. 
 
 
-We will be using the monthly sea ice concetration data from 2014 to see how it is possible to calculated sea ice extent using ArcGIS. 
-
-
-
+We will be using the monthly sea ice concentration data from 2014 to see how it is possible to calculated sea ice extent using ArcGIS. 
 
 ## Project setup
 
@@ -111,7 +108,7 @@ Before that though, choose a raster from the `data_monthly` directory and add it
 The workflow will be:
 
 1. Load in the raster data into an ArcPy object.
-2. Use raster conditional statement within the ArcGIS Spatial Analyst extension, to extract all cells that are 15% or above using a [conditional statement](http://help.arcgis.com/EN/ArcGISDesktop/10.0/Help/index.html#//009z00000005000000.htm), indicating the extent of sea ice, and output a raster mask with all sea ice cells with the value of 1.
+2. Use [raster conditional statement](http://help.arcgis.com/EN/ArcGISDesktop/10.0/Help/index.html#//009z00000005000000.htm) within the ArcGIS Spatial Analyst extension, to extract all cells that are 15% or above (ice covered cells). The result of this will be a raster mask where all values of 1 are ice covered cells.
 3. Convert the raster to a polygon feature class. Note, there might be more than one polygon feature. 
 4. Total up the areas of the polygons within the feature class. 
 
@@ -158,7 +155,7 @@ As mentioned above, sea ice concentration data from this dataset goes back to 19
 
 Using the monthly data, we are going to calculate how sea ice extent changes over the course of 2014. We therefore need to calculate extent for 12 grids.
 
-It's quite tedious to copy and paste the above commands in for all 12 months, so we are now going to see how we can automate this processing using some Python scripting. 
+It's quite tedious to copy and paste the above commands for all 12 months, so we are now going to see how we can automate this processing using some Python scripting. 
 
 The script will implement the above commands on each piece of data in turn by running a loop to iterate through each raster in turn. 
 
@@ -232,7 +229,7 @@ The glob module allows us to search for certain files within a directory based o
     ```
 
 2. **import os:**
-The os module allows us to perform file operations. We have used it in this script to select only the file name (basename) from a file path, ie.
+The os module allows us to perform file operations. We have used it in this script to extract the file name (basename) from a file path, ie.
 
     ```python
     raster_name = os.path.basename(data)
@@ -251,12 +248,9 @@ Here we are creating a table in the the geodatabase to store the results from th
 4. **for data in data_listing:**
 This represents the start of the loop, which takes each file path in the `data_listing` list and performs the GIS operations on each raster file. 
 
+### Good job!
 
-
-## Final thoughts...
-
-If this is the first time you have tried scripting, don't worry. Try things, make mistakes, break things and work out why they aren't running. Play around with different ArcPy functions and enjoy. You can't cause any damage. Final tip: watch out for typos.
-
+You've now managed to calculate monthly sea ice extent for 2014. Have a look at the results in the `extent_results` table.
 
 ## What can you do from here?
 
@@ -280,6 +274,12 @@ data_listing = glob.glob('{}nt_1984*.tif'.format(data_dir))
 * Create a time attribute on the polygon features and run animations. 
 
 * Calculate the extent of ice that is classified as over 50% concentration. 
+
+
+## Final thoughts...
+
+If this is the first time you have tried scripting, don't worry. Try things, make mistakes, break things and work out why they aren't running. Play around with different ArcPy and other Python library functions and enjoy. Final tip: watch out for typos.
+
 
 ## Reference
 
