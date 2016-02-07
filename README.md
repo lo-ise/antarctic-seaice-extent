@@ -11,6 +11,8 @@ The operations will be executing using the Python prompt in ArcGIS Desktop.
 
 It will go on to show how to perform the same commands on any number of datasets. 
 
+![ Sea ice](images/sea-ice-3.jpg)
+
 ## Learning outcomes
 
 GIS based functions
@@ -25,6 +27,8 @@ Datasets
 
 Coding / Scripting
 * An introduction to scripting in ArcGIS using ArcPy (Python library). 
+
+![Sea ice](images/sea-ice-2.jpg)
 
 ## Tools required
 
@@ -42,6 +46,8 @@ Here are some links to learn more about sea ice.
 * [Polar bear habitats](http://wwf.panda.org/what_we_do/where_we_work/arctic/wildlife/polar_bear/habitat/)
 * [More on Arctic Sea Ice](http://earthobservatory.nasa.gov/Features/SeaIce/page3.php)
 
+
+![Sea ice](images/sea-ice-4.jpg)
 
 ## The data source
 
