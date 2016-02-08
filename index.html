@@ -2,7 +2,7 @@
 <html lang="en-us">
   <head>
     <meta charset="UTF-8">
-    <title>Antarctic-seaice-extent by lo-ise</title>
+    <title>Antarctic seaice extent by lo-ise</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
     <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
@@ -11,7 +11,7 @@
   </head>
   <body>
     <section class="page-header">
-      <h1 class="project-name">Antarctic-seaice-extent</h1>
+      <h1 class="project-name">Antarctic seaice extent</h1>
       <h2 class="project-tagline">A tutorial to calculate Antarctic Sea Ice extent from a timeseries of Sea Ice concentration data</h2>
       <a href="https://github.com/lo-ise/antarctic-seaice-extent" class="btn">View on GitHub</a>
       <a href="https://github.com/lo-ise/antarctic-seaice-extent/zipball/master" class="btn">Download .zip</a>
@@ -26,7 +26,7 @@
 
 <p>The exercise will begin by introducing a chain of operations to go from reading in the sea ice concentration data, to outputting a calculation of the extent. It will first demonstrate this on one single band raster dataset. </p>
 
-<p>The operations will be executing using the Python prompt in ArcGIS Desktop. </p>
+<p>The operations will be executed using the Python prompt in ArcGIS Desktop. </p>
 
 <p>Finally, it will show how to perform the same commands on any number of datasets. </p>
 
@@ -37,7 +37,7 @@
 
 <ul>
 <li>Raster conditional statements</li>
-<li>Awareness of choosing correct projections</li>
+<li>Awareness of choosing an appropriate projection</li>
 <li>Area calculations</li>
 <li>Raster to vector conversions</li>
 </ul>
@@ -76,14 +76,12 @@
 </ul>
 
 <p><img src="images/sea-ice-4.jpg" alt="Sea ice">
-<img src="images/sea-ice-3.jpg" alt="Sea ice">
-<img src="images/sea-ice-2.jpg" alt="Sea ice">
-<img src="images/sea-ice-1.jpg" alt="Sea ice"></p>
+<img src="images/sea-ice-3.jpg" alt="Sea ice"></p>
 
 <h2>
 <a id="the-data-source" class="anchor" href="#the-data-source" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>The data source</h2>
 
-<p>For this exercise, we will be using passive microwave radiometer data, from a continuous dataset that goes back to 1979. </p>
+<p>For this exercise, we will be using <a href="https://nsidc.org/cryosphere/seaice/study/passive_remote_sensing.html">passive microwave radiometer</a> data, from a continuous dataset that goes back to 1979. </p>
 
 <p>Objects on the earths surface emit microwave radiation at relatively low energy levels. The structure of ice typically emits more microwave radiation than the surrounding liquid water in the sea. Therefore, microwave radiometers can be used to detect the presence of sea ice. </p>
 
@@ -121,9 +119,9 @@ arcpy.env.overwriteOutput <span class="pl-k">=</span> <span class="pl-c1">True</
 
 <p><code>arcpy.env.workspace</code> is the default workspace that all outputs will be saved to. The <code>arcpy.env.scratchWorkspace</code> is for all the temporary files that ArcGIS might create during the processing. </p>
 
-<p><code>arcpy.env.outputCoordinateSystem</code> simply ensures that all outputs will be converted to an equal area projection,i South Polar Lambert Azimuthal Equal Area. We will be calucating areas, so it is important to ensure we calculate on an equal area projection. </p>
+<p><code>arcpy.env.outputCoordinateSystem</code> simply ensures that all outputs will be converted to an equal area projection, <a href="http://spatialreference.org/ref/esri/south-pole-lambert-azimuthal-equal-area/">"South Polar Lambert Azimuthal Equal Area"</a>. We will be calucating areas, so it is important to ensure we calculate on an equal area projection. </p>
 
-<p>Finally, <code>arcpy.env.overwriteOutput = True</code> prevents the annoyance of having to delete outputs from the database before repeats of the same process are completed.  </p>
+<p>Finally, <code>arcpy.env.overwriteOutput = True</code> prevents the annoyance of having to delete outputs from the database before repeats of the same process can be completed.  </p>
 
 <h2>
 <a id="extracting-area-of-sea-ice-extent-from-one-piece-of-data" class="anchor" href="#extracting-area-of-sea-ice-extent-from-one-piece-of-data" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Extracting area of sea ice extent from one piece of data</h2>
@@ -155,7 +153,7 @@ arcpy.env.overwriteOutput <span class="pl-k">=</span> <span class="pl-c1">True</
 seaice_mask <span class="pl-k">=</span> Con(seaice_raster <span class="pl-k">&gt;=</span> <span class="pl-c1">15</span>, <span class="pl-c1">1</span>)
 seaice_mask.save(<span class="pl-s"><span class="pl-pds">'</span>nt_201401_f17_v1_1_s_mask<span class="pl-pds">'</span></span>)</pre></div>
 
-<p>In this three lines we are creating a Raster object, pulling out all the cells whose values are 15 or above to a mask object (<code>Con(seaice_raster &gt;= 15, 1)</code>), and finally saving the mask object to the geodatabase. </p>
+<p>In these three lines we are creating a Raster object, pulling out all the cells that have a value of 15 or above to a mask object (<code>Con(seaice_raster &gt;= 15, 1)</code>), and finally saving the mask object to the geodatabase. </p>
 
 <div class="highlight highlight-source-python"><pre>arcpy.RasterToPolygon_conversion(seaice_mask, <span class="pl-s"><span class="pl-pds">"</span>nt_201401_f17_v1_1_s_mask_poly<span class="pl-pds">"</span></span>)</pre></div>
 
@@ -166,7 +164,7 @@ total_area <span class="pl-k">=</span> area_field[<span class="pl-s"><span class
 <span class="pl-c1">print</span> total_area
 </pre></div>
 
-<p>These final few lines extract all the records in the <code>Shape_Area</code> field of the attribute table, which is already calculated in the previous step by default. It them sums these values which give us <code>total_area</code>. </p>
+<p>These final few lines extract all the records in the <code>Shape_Area</code> field of the attribute table, which is already calculated in the previous step by default. It then sums these values which give us <code>total_area</code>. </p>
 
 <p>The result will be a printed area...</p>
 
@@ -185,12 +183,12 @@ total_area <span class="pl-k">=</span> area_field[<span class="pl-s"><span class
 
 <p>It's quite tedious to copy and paste the above commands for all 12 months, so we are now going to see how we can automate this processing using some Python scripting. </p>
 
-<p>The script will implement the above commands on each piece of data in turn by using a loop to iterate through each raster in turn. </p>
+<p>The script will implement the above commands on each piece of data in turn by using a loop to operate on each raster in turn. </p>
 
 <h3>
 <a id="create-the-script" class="anchor" href="#create-the-script" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Create the script</h3>
 
-<p>Type the following into a text editor, and save the file as <code>extent_multiple_grid.py</code> (NB: make sure you keep the indents, they are 4 spaces long). </p>
+<p>Type the following into a text editor, and save the file as <code>extent_multiple_grid.py</code>. Mmake sure you keep the indents, they are 4 spaces long. </p>
 
 <div class="highlight highlight-source-python"><pre>
 <span class="pl-k">import</span> arcpy
@@ -200,12 +198,14 @@ total_area <span class="pl-k">=</span> area_field[<span class="pl-s"><span class
 <span class="pl-k">import</span> glob
 <span class="pl-k">import</span> os
 
-arcpy.env.workspace <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">'</span>e:/dev/antarctic-seaice-extent/antarctic_sea_ice.gdb<span class="pl-pds">'</span></span>
-arcpy.env.scratchWorkspace <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">'</span>e:/dev/antarctic-seaice-extent/antarctic_sea_ice_scratch.gdb<span class="pl-pds">'</span></span>
+working_dir <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">'</span>e:/dev/antarctic-seaice-extent/<span class="pl-pds">'</span></span>
+
+arcpy.env.workspace <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">'</span><span class="pl-c1">{}</span>/antarctic_sea_ice.gdb<span class="pl-pds">'</span></span>.format(working_dir)
+arcpy.env.scratchWorkspace <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">'</span><span class="pl-c1">{}</span>/antarctic_sea_ice_scratch.gdb<span class="pl-pds">'</span></span>.format(working_dir)
 arcpy.env.outputCoordinateSystem <span class="pl-k">=</span> arcpy.SpatialReference(<span class="pl-s"><span class="pl-pds">'</span>South Pole Lambert Azimuthal Equal Area<span class="pl-pds">'</span></span>)
 arcpy.env.overwriteOutput <span class="pl-k">=</span> <span class="pl-c1">True</span>
 
-data_dir <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">'</span>e:/dev/antarctic-seaice-extent/data_monthly/<span class="pl-pds">'</span></span>
+data_dir <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">'</span><span class="pl-c1">{}</span>/data_monthly/<span class="pl-pds">'</span></span>.format(working_dir)
 data_listing <span class="pl-k">=</span> glob.glob(<span class="pl-s"><span class="pl-pds">'</span><span class="pl-c1">{}</span>nt_2014*.tif<span class="pl-pds">'</span></span>.format(data_dir))
 
 <span class="pl-k">if</span> <span class="pl-k">not</span> arcpy.Exists(<span class="pl-s"><span class="pl-pds">'</span>extent_results<span class="pl-pds">'</span></span>):
@@ -229,7 +229,7 @@ table_input <span class="pl-k">=</span> arcpy.da.InsertCursor(<span class="pl-s"
 <span class="pl-k">del</span> table_input
 </pre></div>
 
-<p>You will need to make a few changes to the directory paths to ensure the script is pointing to your working directory.</p>
+<p>You will need to change <code>working_dir =</code> to whatever your working directory path is. </p>
 
 <p>Then to run the script from the Python prompt, first remove all layers from the current ArcMap document and type...</p>
 
@@ -309,7 +309,7 @@ data_listing <span class="pl-k">=</span> glob.glob(<span class="pl-s"><span clas
 <p>Cavalieri, D. J., C. L. Parkinson, P. Gloersen, and H. J. Zwally. 1996, updated yearly. Sea Ice Concentrations from Nimbus-7 SMMR and DMSP SSM/I-SSMIS Passive Microwave Data, Version 1. Boulder, Colorado USA. NASA National Snow and Ice Data Center Distributed Active Archive Center. <a href="http://dx.doi.org/10.5067/8GQ8LZQVL0VL">http://dx.doi.org/10.5067/8GQ8LZQVL0VL</a>. [Date Accessed: 2016-02-05].</p>
 
       <footer class="site-footer">
-        <span class="site-footer-owner"><a href="https://github.com/lo-ise/antarctic-seaice-extent">Antarctic-seaice-extent</a> is maintained by <a href="https://github.com/lo-ise">lo-ise</a>.</span>
+        <span class="site-footer-owner"><a href="https://github.com/lo-ise/antarctic-seaice-extent">Antarctic seaice extent</a> is maintained by <a href="https://github.com/lo-ise">lo-ise</a>.</span>
 
         <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
       </footer>
