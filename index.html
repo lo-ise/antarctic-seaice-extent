@@ -95,7 +95,7 @@
 
 <p>Sea ice extent is monitored and calculated on a daily basis by the NSIDC using this data. The output of this is the <a href="http://nsidc.org/data/seaice_index/">Sea Ice Index</a>. The convention is that any cell within the sea ice concentration grids that is above 15% is classed as ice covered and therefore is counted towards the sea ice extent calculation. </p>
 
-<p>We will be using the monthly sea ice concentration data from 2014 to see how it is possible to calculated sea ice extent using ArcGIS. </p>
+<p>We will be using the monthly sea ice concentration data from 2014 to see how it is possible to calculate sea ice extent using ArcGIS. </p>
 
 <h2>
 <a id="project-setup" class="anchor" href="#project-setup" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Project setup</h2>
@@ -115,13 +115,13 @@ arcpy.env.outputCoordinateSystem <span class="pl-k">=</span> arcpy.SpatialRefere
 arcpy.env.overwriteOutput <span class="pl-k">=</span> <span class="pl-c1">True</span>
 </pre></div>
 
-<p>Note that <code>path-to-working-directory</code> should be replaced with the actual path you the working directory that was created in step number 1, ie. <code>c:/working-dir/</code> or something similar. </p>
+<p>Note that <code>path-to-working-directory</code> should be replaced with the actual path of your working directory that was created in step number 1, ie. <code>c:/working-dir/</code> or something similar. </p>
 
 <p>The above commands are simply setting the processing environment for the operations that will be conducted. </p>
 
 <p><code>arcpy.env.workspace</code> is the default workspace that all outputs will be saved to. The <code>arcpy.env.scratchWorkspace</code> is for all the temporary files that ArcGIS might create during the processing. </p>
 
-<p><code>arcpy.env.outputCoordinateSystem</code> simply ensures that all outputs will be converted to an equal area projection,South Polar Lambert Azimuthal Equal Area. We will be calucating areas, so it is important to ensure we calculate on an equal area projection. </p>
+<p><code>arcpy.env.outputCoordinateSystem</code> simply ensures that all outputs will be converted to an equal area projection,i South Polar Lambert Azimuthal Equal Area. We will be calucating areas, so it is important to ensure we calculate on an equal area projection. </p>
 
 <p>Finally, <code>arcpy.env.overwriteOutput = True</code> prevents the annoyance of having to delete outputs from the database before repeats of the same process are completed.  </p>
 
@@ -168,7 +168,11 @@ total_area <span class="pl-k">=</span> area_field[<span class="pl-s"><span class
 
 <p>These final few lines extract all the records in the <code>Shape_Area</code> field of the attribute table, which is already calculated in the previous step by default. It them sums these values which give us <code>total_area</code>. </p>
 
-<p>The result will be a printed area, a raster mask and a polygon mask.</p>
+<p>The result will be a printed area...</p>
+
+<div class="highlight highlight-source-python"><pre><span class="pl-k">&gt;&gt;</span><span class="pl-k">&gt;</span> <span class="pl-c1">6840075924993</span></pre></div>
+
+<p>We've gone from sea ice concentration data, to a raster mask, to a polygon from which we can easily calculate area.</p>
 
 <p><img src="images/data-renders.jpg" alt="Data renders"></p>
 
@@ -181,7 +185,7 @@ total_area <span class="pl-k">=</span> area_field[<span class="pl-s"><span class
 
 <p>It's quite tedious to copy and paste the above commands for all 12 months, so we are now going to see how we can automate this processing using some Python scripting. </p>
 
-<p>The script will implement the above commands on each piece of data in turn by running a loop to iterate through each raster in turn. </p>
+<p>The script will implement the above commands on each piece of data in turn by using a loop to iterate through each raster in turn. </p>
 
 <h3>
 <a id="create-the-script" class="anchor" href="#create-the-script" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Create the script</h3>
