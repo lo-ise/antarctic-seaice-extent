@@ -24,11 +24,11 @@
 
 <p>This exercise presents a method to calculate sea ice extent from sea ice concentration data, using ArcGIS.</p>
 
-<p>The exercise will begin by introducing a chain of operations to go from reading in the sea ice concentration data, to outputting a calculation of the area. It will first demonstrate this on one single band raster dataset. </p>
+<p>The exercise will begin by introducing a chain of operations to go from reading in the sea ice concentration data, to outputting a calculation of the extent. It will first demonstrate this on one single band raster dataset. </p>
 
 <p>The operations will be executing using the Python prompt in ArcGIS Desktop. </p>
 
-<p>It will go on to show how to perform the same commands on any number of datasets. </p>
+<p>Finally, it will show how to perform the same commands on any number of datasets. </p>
 
 <h2>
 <a id="learning-outcomes" class="anchor" href="#learning-outcomes" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Learning outcomes</h2>
@@ -46,13 +46,13 @@
 
 <ul>
 <li>Working with high temporal resolution data</li>
-<li>Gain an understand for available data on sea ice derived from remote sensing instruments</li>
+<li>Sea ice data products derived from remote sensing instruments</li>
 </ul>
 
 <p>Coding / Scripting</p>
 
 <ul>
-<li>An introduction to scripting in ArcGIS using ArcPy (Python library). </li>
+<li>An introduction to scripting in ArcGIS using ArcPy (Python library)</li>
 </ul>
 
 <h2>
@@ -93,9 +93,9 @@
 
 <p>To find out more information, or to access the raw data, visit the <a href="http://nsidc.org/data/nsidc-0051">data source webpages</a>.</p>
 
-<p>Sea ice extent is monitored and calculated on a daily basis by the NSIDC using this data and the output of this is the <a href="http://nsidc.org/data/seaice_index/">Sea Ice Index</a>. The convention is that any cell within the sea ice concetration grids that is above 15% is classed as ice covered and therefore is counted towards the sea ice extent calculation. </p>
+<p>Sea ice extent is monitored and calculated on a daily basis by the NSIDC using this data. The output of this is the <a href="http://nsidc.org/data/seaice_index/">Sea Ice Index</a>. The convention is that any cell within the sea ice concentration grids that is above 15% is classed as ice covered and therefore is counted towards the sea ice extent calculation. </p>
 
-<p>We will be using the monthly sea ice concetration data from 2014 to see how it is possible to calculated sea ice extent using ArcGIS. </p>
+<p>We will be using the monthly sea ice concentration data from 2014 to see how it is possible to calculated sea ice extent using ArcGIS. </p>
 
 <h2>
 <a id="project-setup" class="anchor" href="#project-setup" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Project setup</h2>
@@ -136,7 +136,7 @@ arcpy.env.overwriteOutput <span class="pl-k">=</span> <span class="pl-c1">True</
 
 <ol>
 <li>Load in the raster data into an ArcPy object.</li>
-<li>Use raster conditional statement within the ArcGIS Spatial Analyst extension, to extract all cells that are 15% or above using a <a href="http://help.arcgis.com/EN/ArcGISDesktop/10.0/Help/index.html#//009z00000005000000.htm">conditional statement</a>, indicating the extent of sea ice, and output a raster mask with all sea ice cells with the value of 1.</li>
+<li>Use <a href="http://help.arcgis.com/EN/ArcGISDesktop/10.0/Help/index.html#//009z00000005000000.htm">raster conditional statement</a> within the ArcGIS Spatial Analyst extension, to extract all cells that are 15% or above (ice covered cells). The result of this will be a raster mask where all values of 1 are ice covered cells.</li>
 <li>Convert the raster to a polygon feature class. Note, there might be more than one polygon feature. </li>
 <li>Total up the areas of the polygons within the feature class. </li>
 </ol>
@@ -179,7 +179,7 @@ total_area <span class="pl-k">=</span> area_field[<span class="pl-s"><span class
 
 <p>Using the monthly data, we are going to calculate how sea ice extent changes over the course of 2014. We therefore need to calculate extent for 12 grids.</p>
 
-<p>It's quite tedious to copy and paste the above commands in for all 12 months, so we are now going to see how we can automate this processing using some Python scripting. </p>
+<p>It's quite tedious to copy and paste the above commands for all 12 months, so we are now going to see how we can automate this processing using some Python scripting. </p>
 
 <p>The script will implement the above commands on each piece of data in turn by running a loop to iterate through each raster in turn. </p>
 
@@ -249,7 +249,7 @@ The glob module allows us to search for certain files within a directory based o
 </li>
 <li>
 <p><strong>import os:</strong>
-The os module allows us to perform file operations. We have used it in this script to select only the file name (basename) from a file path, ie.</p>
+The os module allows us to perform file operations. We have used it in this script to extract the file name (basename) from a file path, ie.</p>
 
 <div class="highlight highlight-source-python"><pre>raster_name <span class="pl-k">=</span> os.path.basename(data)</pre></div>
 </li>
@@ -266,10 +266,10 @@ Here we are creating a table in the the geodatabase to store the results from th
 This represents the start of the loop, which takes each file path in the <code>data_listing</code> list and performs the GIS operations on each raster file. </p></li>
 </ol>
 
-<h2>
-<a id="final-thoughts" class="anchor" href="#final-thoughts" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Final thoughts...</h2>
+<h3>
+<a id="good-job" class="anchor" href="#good-job" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Good job!</h3>
 
-<p>If this is the first time you have tried scripting, don't worry. Try things, make mistakes, break things and work out why they aren't running. Play around with different ArcPy functions and enjoy. You can't cause any damage. Final tip: watch out for typos.</p>
+<p>You've now managed to calculate monthly sea ice extent for 2014. Have a look at the results in the <code>extent_results</code> table.</p>
 
 <h2>
 <a id="what-can-you-do-from-here" class="anchor" href="#what-can-you-do-from-here" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>What can you do from here?</h2>
@@ -295,9 +295,14 @@ data_listing <span class="pl-k">=</span> glob.glob(<span class="pl-s"><span clas
 </ul>
 
 <h2>
+<a id="final-thoughts" class="anchor" href="#final-thoughts" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Final thoughts...</h2>
+
+<p>If this is the first time you have tried scripting, don't worry. Try things, make mistakes, break things and work out why they aren't running. Play around with different ArcPy and other Python library functions and enjoy. Final tip: watch out for typos.</p>
+
+<h2>
 <a id="reference" class="anchor" href="#reference" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Reference</h2>
 
-<p>Cavalieri, D. J., C. L. Parkinson, P. Gloersen, and H. J. Zwally. 1996, updated yearly. Sea Ice Concentrations from Nimbus-7 SMMR and DMSP SSM/I-SSMIS Passive Microwave Data, Version 1. [indicate subset used]. Boulder, Colorado USA. NASA National Snow and Ice Data Center Distributed Active Archive Center. <a href="http://dx.doi.org/10.5067/8GQ8LZQVL0VL">http://dx.doi.org/10.5067/8GQ8LZQVL0VL</a>. [Date Accessed].</p>
+<p>Cavalieri, D. J., C. L. Parkinson, P. Gloersen, and H. J. Zwally. 1996, updated yearly. Sea Ice Concentrations from Nimbus-7 SMMR and DMSP SSM/I-SSMIS Passive Microwave Data, Version 1. Boulder, Colorado USA. NASA National Snow and Ice Data Center Distributed Active Archive Center. <a href="http://dx.doi.org/10.5067/8GQ8LZQVL0VL">http://dx.doi.org/10.5067/8GQ8LZQVL0VL</a>. [Date Accessed: 2016-02-05].</p>
 
       <footer class="site-footer">
         <span class="site-footer-owner"><a href="https://github.com/lo-ise/antarctic-seaice-extent">Antarctic-seaice-extent</a> is maintained by <a href="https://github.com/lo-ise">lo-ise</a>.</span>
