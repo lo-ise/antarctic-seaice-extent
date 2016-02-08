@@ -5,18 +5,20 @@ import numpy
 import glob
 import os
 
-arcpy.CheckOutExtension('Spatial')
+arcpy.CheckOutExtension("Spatial")
 
-arcpy.env.workspace = 'e:/dev/antarctic-seaice-extent/antarctic_sea_ice.gdb'
-arcpy.env.scratchWorkspace = 'e:/dev/antarctic-seaice-extent/antarctic_sea_ice_scratch.gdb'
+working_dir = 'e:/dev/antarctic-seaice-extent/'
+
+arcpy.env.workspace = '{}/antarctic_sea_ice.gdb'.format(working_dir)
+arcpy.env.scratchWorkspace = '{}/antarctic_sea_ice_scratch.gdb'.format(working_dir)
 arcpy.env.outputCoordinateSystem = arcpy.SpatialReference('South Pole Lambert Azimuthal Equal Area')
 arcpy.env.overwriteOutput = True
 
-data_dir = 'e:/dev/antarctic-seaice-extent/data_monthly/'
-data_listing = glob.glob('{}nt_2014*.tif'.format(data_dir))
+data_dir = '{}/data_monthly/'.format(working_dir)
+data_listing = glob.glob('{}nt_201401*.tif'.format(data_dir))
 
 if not arcpy.Exists('extent_results'):
-    arcpy.CreateTable_management(arcpy.env.workspace, 'extent_results') 
+    arcpy.CreateTable_management(arcpy.env.workspace, 'extent_results')
     arcpy.AddField_management("extent_results", 'data_source', "TEXT")
     arcpy.AddField_management("extent_results", 'area', "DOUBLE")
 
@@ -32,5 +34,6 @@ for data in data_listing:
     area_field = arcpy.da.TableToNumPyArray("{}_mask_poly".format(raster_name), "Shape_Area")
     total_area = area_field["Shape_Area"].sum()
     table_input.insertRow([raster_name, total_area])
+    print total_area
 
 del table_input

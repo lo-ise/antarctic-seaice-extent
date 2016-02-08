@@ -7,7 +7,7 @@ This exercise presents a method to calculate sea ice extent from sea ice concent
 
 The exercise will begin by introducing a chain of operations to go from reading in the sea ice concentration data, to outputting a calculation of the extent. It will first demonstrate this on one single band raster dataset. 
 
-The operations will be executing using the Python prompt in ArcGIS Desktop. 
+The operations will be executed using the Python prompt in ArcGIS Desktop. 
 
 Finally, it will show how to perform the same commands on any number of datasets. 
 
@@ -16,7 +16,7 @@ Finally, it will show how to perform the same commands on any number of datasets
 
 GIS based functions
 * Raster conditional statements
-* Awareness of choosing correct projections
+* Awareness of choosing an appropriate projection
 * Area calculations
 * Raster to vector conversions
 
@@ -52,7 +52,7 @@ Here are some links to learn more about sea ice.
 
 ## The data source
 
-For this exercise, we will be using passive microwave radiometer data, from a continuous dataset that goes back to 1979. 
+For this exercise, we will be using [passive microwave radiometer](https://nsidc.org/cryosphere/seaice/study/passive_remote_sensing.html) data, from a continuous dataset that goes back to 1979. 
 
 Objects on the earths surface emit microwave radiation at relatively low energy levels. The structure of ice typically emits more microwave radiation than the surrounding liquid water in the sea. Therefore, microwave radiometers can be used to detect the presence of sea ice. 
 
@@ -60,11 +60,9 @@ One of the output data products provided by the National Snow and Ice Data Centr
 
 ![Sea Ice January 2014](images/sea-ice-2014-01.jpg)
 
-
 To find out more information, or to access the raw data, visit the [data source webpages](http://nsidc.org/data/nsidc-0051).
 
 Sea ice extent is monitored and calculated on a daily basis by the NSIDC using this data. The output of this is the [Sea Ice Index](http://nsidc.org/data/seaice_index/). The convention is that any cell within the sea ice concentration grids that is above 15% is classed as ice covered and therefore is counted towards the sea ice extent calculation. 
-
 
 We will be using the monthly sea ice concentration data from 2014 to see how it is possible to calculate sea ice extent using ArcGIS. 
 
@@ -94,9 +92,9 @@ The above commands are simply setting the processing environment for the operati
 
 `arcpy.env.workspace` is the default workspace that all outputs will be saved to. The `arcpy.env.scratchWorkspace` is for all the temporary files that ArcGIS might create during the processing. 
 
-`arcpy.env.outputCoordinateSystem` simply ensures that all outputs will be converted to an equal area projection,i South Polar Lambert Azimuthal Equal Area. We will be calucating areas, so it is important to ensure we calculate on an equal area projection. 
+`arcpy.env.outputCoordinateSystem` simply ensures that all outputs will be converted to an equal area projection, ["South Polar Lambert Azimuthal Equal Area"](http://spatialreference.org/ref/esri/south-pole-lambert-azimuthal-equal-area/). We will be calucating areas, so it is important to ensure we calculate on an equal area projection. 
 
-Finally, `arcpy.env.overwriteOutput = True` prevents the annoyance of having to delete outputs from the database before repeats of the same process are completed.  
+Finally, `arcpy.env.overwriteOutput = True` prevents the annoyance of having to delete outputs from the database before repeats of the same process can be completed.  
 
 
 ## Extracting area of sea ice extent from one piece of data
@@ -128,7 +126,7 @@ seaice_raster = Raster('nt_201401_f17_v1_1_s.tif')
 seaice_mask = Con(seaice_raster >= 15, 1)
 seaice_mask.save('nt_201401_f17_v1_1_s_mask')
 ```
-In this three lines we are creating a Raster object, pulling out all the cells whose values are 15 or above to a mask object (`Con(seaice_raster >= 15, 1)`), and finally saving the mask object to the geodatabase. 
+In these three lines we are creating a Raster object, pulling out all the cells that have a value of 15 or above to a mask object (`Con(seaice_raster >= 15, 1)`), and finally saving the mask object to the geodatabase. 
 
 ```python
 arcpy.RasterToPolygon_conversion(seaice_mask, "nt_201401_f17_v1_1_s_mask_poly")
@@ -143,7 +141,7 @@ print total_area
 
 ```
 
-These final few lines extract all the records in the `Shape_Area` field of the attribute table, which is already calculated in the previous step by default. It them sums these values which give us `total_area`. 
+These final few lines extract all the records in the `Shape_Area` field of the attribute table, which is already calculated in the previous step by default. It then sums these values which give us `total_area`. 
 
 The result will be a printed area...
 
@@ -164,12 +162,12 @@ Using the monthly data, we are going to calculate how sea ice extent changes ove
 
 It's quite tedious to copy and paste the above commands for all 12 months, so we are now going to see how we can automate this processing using some Python scripting. 
 
-The script will implement the above commands on each piece of data in turn by using a loop to iterate through each raster in turn. 
+The script will implement the above commands on each piece of data in turn by using a loop to operate on each raster in turn. 
 
 
 ### Create the script
 
-Type the following into a text editor, and save the file as `extent_multiple_grid.py` (NB: make sure you keep the indents, they are 4 spaces long). 
+Type the following into a text editor, and save the file as `extent_multiple_grid.py`. Mmake sure you keep the indents, they are 4 spaces long. 
 
 ```python
 
@@ -180,12 +178,14 @@ import numpy
 import glob
 import os
 
-arcpy.env.workspace = 'e:/dev/antarctic-seaice-extent/antarctic_sea_ice.gdb'
-arcpy.env.scratchWorkspace = 'e:/dev/antarctic-seaice-extent/antarctic_sea_ice_scratch.gdb'
+working_dir = 'e:/dev/antarctic-seaice-extent/'
+
+arcpy.env.workspace = '{}/antarctic_sea_ice.gdb'.format(working_dir)
+arcpy.env.scratchWorkspace = '{}/antarctic_sea_ice_scratch.gdb'.format(working_dir)
 arcpy.env.outputCoordinateSystem = arcpy.SpatialReference('South Pole Lambert Azimuthal Equal Area')
 arcpy.env.overwriteOutput = True
 
-data_dir = 'e:/dev/antarctic-seaice-extent/data_monthly/'
+data_dir = '{}/data_monthly/'.format(working_dir)
 data_listing = glob.glob('{}nt_2014*.tif'.format(data_dir))
 
 if not arcpy.Exists('extent_results'):
@@ -209,8 +209,7 @@ for data in data_listing:
 del table_input
 
 ```
-
-You will need to make a few changes to the directory paths to ensure the script is pointing to your working directory.
+You will need to change `working_dir = ` to whatever your working directory path is. 
 
 Then to run the script from the Python prompt, first remove all layers from the current ArcMap document and type...
 
