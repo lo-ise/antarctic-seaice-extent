@@ -47,8 +47,6 @@ Here are some links to learn more about sea ice.
 
 ![Sea ice](images/sea-ice-4.jpg)
 ![Sea ice](images/sea-ice-3.jpg)
-![Sea ice](images/sea-ice-2.jpg)
-![Sea ice](images/sea-ice-1.jpg)
 
 ## The data source
 
