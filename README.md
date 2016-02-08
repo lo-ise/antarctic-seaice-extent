@@ -66,7 +66,7 @@ To find out more information, or to access the raw data, visit the [data source 
 Sea ice extent is monitored and calculated on a daily basis by the NSIDC using this data. The output of this is the [Sea Ice Index](http://nsidc.org/data/seaice_index/). The convention is that any cell within the sea ice concentration grids that is above 15% is classed as ice covered and therefore is counted towards the sea ice extent calculation. 
 
 
-We will be using the monthly sea ice concentration data from 2014 to see how it is possible to calculated sea ice extent using ArcGIS. 
+We will be using the monthly sea ice concentration data from 2014 to see how it is possible to calculate sea ice extent using ArcGIS. 
 
 ## Project setup
 
@@ -88,13 +88,13 @@ arcpy.env.outputCoordinateSystem = arcpy.SpatialReference('South Pole Lambert Az
 arcpy.env.overwriteOutput = True
 
 ```
-Note that `path-to-working-directory` should be replaced with the actual path you the working directory that was created in step number 1, ie. `c:/working-dir/` or something similar. 
+Note that `path-to-working-directory` should be replaced with the actual path of your working directory that was created in step number 1, ie. `c:/working-dir/` or something similar. 
 
 The above commands are simply setting the processing environment for the operations that will be conducted. 
 
 `arcpy.env.workspace` is the default workspace that all outputs will be saved to. The `arcpy.env.scratchWorkspace` is for all the temporary files that ArcGIS might create during the processing. 
 
-`arcpy.env.outputCoordinateSystem` simply ensures that all outputs will be converted to an equal area projection,South Polar Lambert Azimuthal Equal Area. We will be calucating areas, so it is important to ensure we calculate on an equal area projection. 
+`arcpy.env.outputCoordinateSystem` simply ensures that all outputs will be converted to an equal area projection,i South Polar Lambert Azimuthal Equal Area. We will be calucating areas, so it is important to ensure we calculate on an equal area projection. 
 
 Finally, `arcpy.env.overwriteOutput = True` prevents the annoyance of having to delete outputs from the database before repeats of the same process are completed.  
 
@@ -145,7 +145,14 @@ print total_area
 
 These final few lines extract all the records in the `Shape_Area` field of the attribute table, which is already calculated in the previous step by default. It them sums these values which give us `total_area`. 
 
-The result will be a printed area, a raster mask and a polygon mask.
+The result will be a printed area...
+
+```python
+>>> 6840075924993
+```
+
+We've gone from sea ice concentration data, to a raster mask, to a polygon from which we can easily calculate area.
+
 
 ![Data renders](images/data-renders.jpg)
 
@@ -157,7 +164,7 @@ Using the monthly data, we are going to calculate how sea ice extent changes ove
 
 It's quite tedious to copy and paste the above commands for all 12 months, so we are now going to see how we can automate this processing using some Python scripting. 
 
-The script will implement the above commands on each piece of data in turn by running a loop to iterate through each raster in turn. 
+The script will implement the above commands on each piece of data in turn by using a loop to iterate through each raster in turn. 
 
 
 ### Create the script
